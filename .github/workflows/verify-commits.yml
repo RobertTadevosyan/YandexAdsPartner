@@ -1,4 +1,18 @@
-- name: Check for a single commit in PR
-  run: |
-    git fetch origin ${{ github.base_ref }}
-    bash ./scripts/check-single-commit.sh
+name: Verify Commits Count
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:  
+  check-single-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Important for git history
+
+      - name: Check for a single commit in PR
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          bash ./scripts/check-single-commit.sh
