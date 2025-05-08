@@ -80,9 +80,6 @@ You can switch between them in `lib/theme/themes.dart`.
 
 ## 📸 Screenshots
 
-### OAuth Token Input
-![Token Input](screenshots/screenshot_token.jpg)
-
 ### Date Ranges And Groups
 ![Date Ranges And Groups](screenshots/screenshot_date_range_and_groups.jpg)
 
@@ -105,7 +102,7 @@ To access the Yandex Ads API, you need a **personal OAuth token**. Here's how to
 
 > 💡 Your token is saved securely in local preferences and reused automatically.
 
-![Get Token](screenshots/screenshot_token_fetch.png)
+![Get Token](screenshots/screenshot_token.jpg)
 
 ---
 
