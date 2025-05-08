@@ -2,7 +2,7 @@
 
 **YaAdsPartner** is a Flutter application designed to help users monitor and visualize their Yandex Ads Monetization performance. With support for filters, custom date ranges, and clean UI themes, it's built for ease of use and flexible reporting.
 
-![App Icon](assets/icons/icon.png)
+<img src="assets/icons/icon.png" alt="App Icon" width="300"/>
 
 ---
 
@@ -81,13 +81,13 @@ You can switch between them in `lib/theme/themes.dart`.
 ## 📸 Screenshots
 
 ### Date Ranges And Groups
-![Date Ranges And Groups](screenshots/screenshot_date_range_and_groups.jpg)
+<img src="screenshots/screenshot_date_range_and_groups.jpg" alt="Date Ranges And Groups" width="300"/>
 
 ### Indicators
-![Indicators](screenshots/screenshot_indicators.jpg)
+<img src="screenshots/screenshot_indicators.jpg" alt="Indicators" width="300"/>
 
 ### Results
-![Results](screenshots/screenshot_results.jpg)
+<img src="screenshots/screenshot_results.jpg" alt="Results" width="300"/>
 
 ---
 
