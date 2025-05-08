@@ -1,0 +1,4 @@
+- name: Check for a single commit in PR
+  run: |
+    git fetch origin ${{ github.base_ref }}
+    bash ./scripts/check-single-commit.sh

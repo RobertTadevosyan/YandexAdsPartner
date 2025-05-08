@@ -72,4 +72,59 @@ void main() {
     // Ensure the MainPage is built
     expect(find.byType(MainPage), findsOneWidget);
   });
+
+  testWidgets('Token is saved to SharedPreferences', (tester) async {
+    await TokenStorage.clearToken();
+
+    final mockService = MockYandexApiService();
+    when(
+      mockService.fetchAvailableFields('persisted-token'),
+    ).thenAnswer((_) async => []);
+
+    await tester.pumpWidget(
+      MaterialApp(home: TokenGate(apiService: mockService)),
+    );
+
+    await tester.enterText(find.byType(TextField), 'persisted-token');
+    await tester.tap(find.text('Continue'));
+
+    await tester.pump(); // wait one frame
+    await tester.pump(const Duration(seconds: 1)); // allow transition
+
+    final token = await TokenStorage.getToken();
+    expect(token, 'persisted-token');
+    expect(find.byType(MainPage), findsOneWidget);
+  });
+
+  testWidgets('MainPage loads if token is already stored', (
+    WidgetTester tester,
+  ) async {
+    final mockService = MockYandexApiService();
+    when(
+      mockService.fetchAvailableFields('existing-token'),
+    ).thenAnswer((_) async => []);
+
+    await TokenStorage.saveToken('existing-token');
+
+    await tester.pumpWidget(
+      MaterialApp(home: TokenGate(apiService: mockService)),
+    );
+
+    await tester.pump(); // wait one frame
+    await tester.pump(const Duration(seconds: 1)); // allow transition
+    expect(find.byType(MainPage), findsOneWidget);
+  });
+
+  testWidgets('Does not proceed if token field is empty', (
+    WidgetTester tester,
+  ) async {
+    await TokenStorage.clearToken();
+    await tester.pumpWidget(const MaterialApp(home: TokenGate()));
+
+    await tester.enterText(find.byType(TextField), '');
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MainPage), findsNothing);
+  });
 }

@@ -1,0 +1,22 @@
+name: Enforce Branch Naming
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+jobs:
+  check-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch name
+        run: |
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+
+          if ! [[ "$BRANCH" =~ ^(feature|bugfix|release)/.+$ ]]; then
+            echo "❌ Branch name '$BRANCH' does not follow naming conventions: feature/*, bugfix/*, release/*"
+            exit 1
+          fi
+
+          echo "✅ Branch name '$BRANCH' is valid."

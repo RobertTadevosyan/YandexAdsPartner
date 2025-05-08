@@ -53,6 +53,7 @@ class _TokenGateState extends State<TokenGate> {
       await TokenStorage.saveToken(token);
       setState(() => _token = token);
     }
+    // TODO add simple token validation
   }
 
   @override
