@@ -3,7 +3,7 @@ name: Flutter Test
 on:
   push:
     branches:
-      - main 
+      - main  # or any other branch you want to track
   pull_request:
     branches:
       - main
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.2'
+          flutter-version: '2.19.2' 
           channel: stable
 
       - name: Install dependencies
