@@ -2,7 +2,7 @@
 
 **YaAdsPartner** is a Flutter application designed to help users monitor and visualize their Yandex Ads Monetization performance. With support for filters, custom date ranges, and clean UI themes, it's built for ease of use and flexible reporting.
 
-![App Icon](assets/icon.png)
+![App Icon](assets/icons/icon.png)
 
 ---
 
@@ -21,8 +21,8 @@
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/yourusername/yaads_partner.git
-cd yaads_partner
+git clone https://github.com/RobertTadevosyan/YandexAdsPartner.git
+cd 'YandexAdsPartner'
 ```
 
 ### 2. Install dependencies
@@ -80,7 +80,32 @@ You can switch between them in `lib/theme/themes.dart`.
 
 ## 📸 Screenshots
 
-_TODO: Add screenshots of the main UI here._
+### OAuth Token Input
+![Token Input](screenshots/screenshot_token.jpg)
+
+### Date Ranges And Groups
+![Date Ranges And Groups](screenshots/screenshot_date_range_and_groups.jpg)
+
+### Indicators
+![Indicators](screenshots/screenshot_indicators.jpg)
+
+### Results
+![Results](screenshots/screenshot_results.jpg)
+
+---
+
+## 🔐 Where to Get the OAuth Token?
+
+To access the Yandex Ads API, you need a **personal OAuth token**. Here's how to obtain it:
+
+1. Go to your [Yandex Partner Dashboard](https://partner.yandex.ru/v2/dashboard/).
+2. On the **right-side panel**, click the **"API" button** (labeled `API`).
+3. Choose **"Получить OAuth-токен для API статистики"** (Get OAuth token for API statistics).
+4. Copy the generated token and paste it into the app when prompted.
+
+> 💡 Your token is saved securely in local preferences and reused automatically.
+
+![Get Token](screenshots/screenshot_token_fetch.png)
 
 ---
 
