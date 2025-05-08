@@ -2,7 +2,7 @@
 
 **YaAdsPartner** is a Flutter application designed to help users monitor and visualize their Yandex Ads Monetization performance. With support for filters, custom date ranges, and clean UI themes, it's built for ease of use and flexible reporting.
 
-<img src="assets/icons/icon.png" alt="App Icon" width="300"/>
+<img src="assets/icons/icon.png" alt="App Icon" width="200"/>
 
 ---
 
@@ -102,7 +102,7 @@ To access the Yandex Ads API, you need a **personal OAuth token**. Here's how to
 
 > 💡 Your token is saved securely in local preferences and reused automatically.
 
-![Get Token](screenshots/screenshot_token.jpg)
+<img src="screenshots/screenshot_token" alt="Results" width="300"/>
 
 ---
 
