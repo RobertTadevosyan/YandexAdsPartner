@@ -15,6 +15,11 @@
 - 🌗 Multiple design themes (Casual, Techy, etc.)
 - ⚡ Auto-pagination (infinite scroll) for large datasets
 
+### 🛠 Incoming Features
+
+- 📱 View list of mobile ad blocks
+- ✏️ Manage and configure mobile ad blocks
+
 ---
 
 ## 🚀 Getting Started
@@ -81,13 +86,13 @@ You can switch between them in `lib/theme/themes.dart`.
 ## 📸 Screenshots
 
 ### Date Ranges And Groups
-<img src="screenshots/screenshot_date_range_and_groups.jpg" alt="Date Ranges And Groups" width="300"/>
+<img src="screenshots/screenshot_date_range_and_groups.jpg" alt="Date Ranges And Groups" width="320"/>
 
 ### Indicators
-<img src="screenshots/screenshot_indicators.jpg" alt="Indicators" width="300"/>
+<img src="screenshots/screenshot_indicators.jpg" alt="Indicators" width="320"/>
 
 ### Results
-<img src="screenshots/screenshot_results.jpg" alt="Results" width="300"/>
+<img src="screenshots/screenshot_results.jpg" alt="Results" width="320"/>
 
 ---
 
@@ -102,7 +107,7 @@ To access the Yandex Ads API, you need a **personal OAuth token**. Here's how to
 
 > 💡 Your token is saved securely in local preferences and reused automatically.
 
-<img src="screenshots/screenshot_token" alt="Results" width="300"/>
+<img src="screenshots/screenshot_token.jpg" alt="Results" width="320"/>
 
 ---
 
