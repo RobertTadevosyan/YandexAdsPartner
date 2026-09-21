@@ -4,8 +4,8 @@
 AdPocket
 
 ## Subtitle / short description
-- App Store subtitle (30): `YAN partner stats in your pocket`
-- Google Play short description (80): `Yandex Advertising Network revenue, reports and widgets — fast, private, unofficial`
+- App Store subtitle (30): `YAN partner stats in pocket`
+- Google Play short description (80): `Yandex Advertising Network revenue, reports, widgets. Fast, private, unofficial`
 
 ## Promotional text (App Store, 170)
 Today's revenue at a glance, full reports with filters, home-screen widgets and daily summaries. Your token never leaves your device.
