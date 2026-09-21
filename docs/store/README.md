@@ -43,7 +43,7 @@ tools/                         HTML templates and the build script
 | Data safety | see `data-safety.md` |
 | Government apps / Financial features | No |
 | Screenshots | phone from `screenshots/play/`, 10" tablet from `screenshots/play-tablet/` (also accepted for 7") |
-| Release | Internal testing track first, then Production |
+| Release | Production track (or Internal testing first for a smoke test); upload `app-release.aab`, add the release notes from the listing files |
 
 ## App Store Connect checklist
 | Field | Value |
@@ -57,6 +57,30 @@ tools/                         HTML templates and the build script
 | Sign-in | Not applicable (no accounts on our side); provide a demo token or the demo build for App Review in the Review Notes |
 | Export compliance | Uses only standard HTTPS → exempt (set `ITSAppUsesNonExemptEncryption = NO` in Info.plist) |
 | Screenshots | 6.7" (1290×2796) from `screenshots/appstore/`; iPad 13" (2064×2752) from `screenshots/appstore-ipad/` — the app supports iPad, so upload both |
+
+## Release builds
+
+Android (signed with the upload key; `android/key.properties` and
+`android/upload-keystore.jks` are git-ignored, back them up outside the repo —
+losing the upload key means asking Google to reset it):
+
+```
+flutter build appbundle --release      # build/app/outputs/bundle/release/app-release.aab
+```
+
+iOS (automatic signing, team set in the Xcode project; the App Group
+`group.app.adpocket.yan` must exist in the developer portal — Xcode registers it
+from Signing & Capabilities the first time):
+
+```
+flutter build ipa --release --export-method app-store   # build/ios/ipa/*.ipa
+```
+
+Upload the .ipa with Transporter or `xcrun altool --upload-app`, or archive from
+Xcode (Product → Archive → Distribute App).
+
+Bump `version:` in pubspec.yaml before every store upload; both stores reject a
+reused build number.
 
 ## RuStore checklist
 Same texts as Google Play (Russian first), 1080×1920 screenshots, privacy policy URL, category "Бизнес",

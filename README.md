@@ -35,7 +35,7 @@
 
 **Notifications** — local only, no push servers: a daily summary at a chosen time (yesterday's revenue, impressions, eCPM), a monthly summary on the 1st, and alerts when yesterday's revenue falls below half the weekly average or there are no impressions by midday Moscow. Texts are recomputed on every data refresh.
 
-**Privacy** — no server, no analytics, no ads; the bilingual policy in [docs/privacy-site](docs/privacy-site/) is meant to be published on GitHub Pages and is linked from Settings. On Android the app asks to be excluded from battery optimisation when the widget's background refresh is on, with vendor-specific hints (Samsung, Xiaomi, Huawei, OPPO, vivo).
+**Privacy** — no server, no analytics, no ads; the bilingual policy in [docs/privacy-site](docs/privacy-site/) is published at https://roberttadevosyan.github.io/privacy/app.adpocket.yan/ and linked from Settings. On Android the app asks to be excluded from battery optimisation when the widget's background refresh is on, with vendor-specific hints (Samsung, Xiaomi, Huawei, OPPO, vivo).
 
 **Security** — tokens are kept in the platform secure store (Android Keystore / iOS Keychain), never in plain preferences; an optional **App lock** asks for fingerprint, face or the device PIN whenever the app opens or returns from the background
 
