@@ -1,6 +1,6 @@
 {
-    "name": "yapartner",
-    "short_name": "yapartner",
+    "name": "AdPocket",
+    "short_name": "AdPocket",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -36,7 +36,7 @@ migrate_working_dir/
 .buildlog/
 flutter_*.png
 .idea/
-.yapartner/
+.adpocket/
 .macos/
 .android/
 ios/Flutter/Flutter.framework
@@ -80,3 +80,5 @@ ios/.dart_tool/
 
 # Build outputs
 build/
+# golden-test diff output
+test/failures/

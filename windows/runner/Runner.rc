@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.statistics" "\0"
-            VALUE "FileDescription", "yapartner" "\0"
+            VALUE "CompanyName", "AdPocket" "\0"
+            VALUE "FileDescription", "AdPocket" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "yapartner" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.statistics. All rights reserved." "\0"
-            VALUE "OriginalFilename", "yapartner.exe" "\0"
-            VALUE "ProductName", "yapartner" "\0"
+            VALUE "InternalName", "AdPocket" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 AdPocket. All rights reserved." "\0"
+            VALUE "OriginalFilename", "adpocket.exe" "\0"
+            VALUE "ProductName", "AdPocket" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

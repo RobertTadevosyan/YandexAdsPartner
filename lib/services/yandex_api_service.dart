@@ -1,246 +1,236 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
-import 'package:yapartner/models/report_response.dart';
-import 'package:yapartner/models/tree_field.dart';
-import 'package:yapartner/widgets/period_selector.dart';
-
-const String keyData = 'data';
-const String keyTree = 'tree';
-
-const String keyDate = 'date';
-const String keyGeo = 'geo';
-const String keyField = 'field';
-const String keyEntityField = 'entity_field';
-const String keyDimensionField = 'dimension_field';
-const String keyDir = 'dir';
-const String keyPoints = 'points';
-const String keyOrderBy = 'order_by';
-
-const String keyPointDim = 'dimensions';
-const String keyPointMeas = 'measures';
-
-const String keyHeaderAuth = 'Authorization';
-const String headerAuth = 'OAuth';
-
-const String keyLimit = 'limit';
-const String keyLimits = 'limits';
-const String keyOffset = 'offset';
-
-const String keyPeriod = 'period';
-
-const String dirDesc = 'desc';
-const String dirAsc = 'asc';
+import 'package:adpocket/core/period.dart';
+import 'package:adpocket/models/dashboard_data.dart';
+import 'package:adpocket/models/filter_field.dart';
+import 'package:adpocket/models/report_response.dart';
+import 'package:adpocket/models/tree_catalog.dart';
+import 'package:adpocket/services/api_exception.dart';
 
 const String baseUrl = 'https://partner2.yandex.ru/api';
 
-class YandexApiService {
-  static const _baseUrl = '$baseUrl/statistics2/get.json';
+/// Sort order for a report.
+class OrderBy {
+  final String field;
+  final bool desc;
+  const OrderBy(this.field, {this.desc = true});
 
-  /// Fetch statistics with desired fields
-  Future<List<Map<String, dynamic>>> fetchStatistics({
-    required String token,
-    String? period,
-    DateTime? fromDate,
-    DateTime? toDate,
-    List<String> fields = const ['shows'],
-    String dimension = 'date|day',
-  }) async {
-    final queryParams = [
-      'lang=en',
-      if (period != null) '$keyPeriod=$period',
-      if (fromDate != null && toDate != null)
-        '$keyPeriod=${fromDate.toIso8601String().substring(0, 10)}&$keyPeriod=${toDate.toIso8601String().substring(0, 10)}',
-      for (var f in fields) '$keyField=$f',
-      '$keyDimensionField=$dimension',
-    ];
-
-    final uri = Uri.parse('$_baseUrl?${queryParams.join('&')}');
-    // print('[API] Requesting: $uri');
-
-    final response = await http.get(
-      uri,
-      headers: {keyHeaderAuth: '$headerAuth $token'},
-    );
-
-    // print('[API] Status Code: ${response.statusCode}');
-    // print('[API] Body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final points = data[keyData][keyPoints] as List<dynamic>;
-      // print('[API] Parsed points: ${points.length}');
-      return points.map<Map<String, dynamic>>((point) {
-        final date = point[keyPointDim][keyDate][0];
-        final value = point[keyPointMeas][0][fields.first];
-        return {keyDate: date, fields.first: value};
-      }).toList();
-    } else {
-      throw Exception('Failed to fetch data: ${response.statusCode}');
-    }
-  }
-
-  Future<List<TreeField>> fetchAvailableFields(String token) async {
-    final uri = Uri.parse(
-      '$baseUrl/statistics2/tree.json?lang=ru&stat_type=main',
-    );
-
-    final res = await http.get(
-      uri,
-      headers: {keyHeaderAuth: '$headerAuth $token'},
-    );
-
-    if (res.statusCode != 200) {
-      throw Exception('Failed to fetch tree');
-    }
-
-    final body = json.decode(res.body);
-    final tree = body[keyData][keyTree][0];
-
-    final List<TreeField> allFields = [];
-
-    // 1. Regular metric fields
-    final fieldsValues = tree[TreeField.kSourceFields];
-    if (fieldsValues is List) {
-      try {
-        allFields.addAll(
-          fieldsValues.map(
-            (e) => TreeField.fromJson(e, TreeField.kSourceFields),
-          ),
-        );
-      } catch (e) {
-        // print('Error parsing fields: $e');
-      }
-    }
-
-    // Enhanced dimension_fields parsing
-    final dimensionsValues = tree[TreeField.kSourceDimension];
-    if (dimensionsValues is List) {
-      for (var group in dimensionsValues) {
-        allFields.add(TreeField.fromDimension(group));
-      }
-    }
-
-    // 3. Entity fields (e.g. page_id, browser, etc.)
-    final entitiesValues = tree[TreeField.kSourceEntityFields];
-    if (entitiesValues is List) {
-      allFields.addAll(
-        entitiesValues.map(
-          (e) => TreeField.fromJson(e, TreeField.kSourceEntityFields),
-        ),
-      );
-    }
-    return allFields;
-  }
-
- Future<ReportResponse> fetchMainStats({
-    required String token,
-    required DateTime? from,
-    required DateTime? to,
-    required PeriodOption? period,
-    required List<String> fields,
-    Map<String, String> dimensionFields = const <String, String>{},
-    List<String> entityFields = const [],
-    int limit = 50,
-    int offset = 0,
-  }) async {
-    final dimensionFieldParams =
-        dimensionFields.entries
-            .map((e) => '&$keyDimensionField=${e.key}|${e.value}')
-            .join();
-
-    final orderField =
-        dimensionFields[keyDate] != null
-            ? keyDate
-            : dimensionFields[keyGeo] != null
-            ? keyGeo
-            : null;
-    final orderBy =
-        orderField != null
-            ? [
-              {
-                keyField: orderField,
-                keyDir: orderField == keyDate ? dirDesc : dirAsc,
-              },
-            ]
-            : null;
-    final orderByJson =
-        orderBy != null
-            ? '&$keyOrderBy=${Uri.encodeQueryComponent(jsonEncode(orderBy))}'
-            : '';
-
-    final limitsJson = jsonEncode({keyLimit: limit, keyOffset: offset});
-
-    final uri = Uri.parse(
-      '$baseUrl/statistics2/get.json'
-      '?lang=ru'
-      '&stat_type=main'
-      '$orderByJson'
-      '&$keyLimits=${Uri.encodeQueryComponent(limitsJson)}'
-      '${getPeriod(from, to, period)}'
-      '${dimensionFieldParams.isNotEmpty ? dimensionFieldParams : ''}'
-      '${fields.map((f) => '&$keyField=${Uri.encodeQueryComponent(f)}').join()}'
-      '${entityFields.map((f) => '&$keyEntityField=${Uri.encodeQueryComponent(f)}').join()}',
-    );
-
-    // print("fetchMainStats: URL = $uri");
-
-    final response = await http.get(
-      uri,
-      headers: {keyHeaderAuth: '$headerAuth $token'},
-    );
-
-    // print('[API] Status Code: ${response.statusCode}');
-    // print('[API] Body: ${response.body}');
-
-    if (response.statusCode != 200) {
-      throw Exception('Stats request failed');
-    }
-
-    final jsonBody = json.decode(response.body);
-    return ReportResponse.fromJson(jsonBody);
-  }
-
-  static String getPeriod(DateTime? from, DateTime? to, PeriodOption? period) {
-    if (period != null) {
-      return '&$keyPeriod=${period.value}';
-    }
-    if (from != null && to != null) {
-      final fromStr = from.toIso8601String().split("T").first;
-      final toStr = to.toIso8601String().split("T").first;
-      return '&$keyPeriod=$fromStr&$keyPeriod=$toStr';
-    }
-    return '&$keyPeriod=${PeriodOption.today.value}';
-  }
+  Map<String, String> toJson() => {
+    'field': field,
+    'dir': desc ? 'desc' : 'asc',
+  };
 }
 
-    // DO NOT DELETE THIS COMMENTS, THEY MAY BE USED IN THE FUTURE
-    // // 4. Simple filter fields (list of lists)
-    // if (tree['entity_filter_simple_fields'] is List) {
-    //   final listOfLists = tree['entity_filter_simple_fields'] as List;
-    //   for (var sublist in listOfLists) {
-    //     if (sublist is List) {
-    //       allFields.addAll(
-    //         sublist.map(
-    //           (e) => TreeField.fromJson(e, 'entity_filter_simple_fields'),
-    //         ),
-    //       );
-    //     }
-    //   }
-    // }
+/// Statistics API client (https://yandex.ru/dev/partner-statistics/doc/en/).
+class YandexApiService {
+  final http.Client _client;
 
-    // // 5. Complex filter fields (Map)
-    // if (tree['entity_filter_fields'] is Map) {
-    //   final filtersMap = tree['entity_filter_fields'] as Map<String, dynamic>;
-    //   filtersMap.forEach((key, value) {
-    //     allFields.add(
-    //       TreeField(
-    //         id: key,
-    //         title: key,
-    //         type: value['type'] ?? '',
-    //         category: value['category'],
-    //         categoryName: value['category_name'] ?? 'Фильтры',
-    //         source: 'entity_filter_fields',
-    //       ),
-    //     );
-    //   });
-    // }
+  YandexApiService({http.Client? client}) : _client = client ?? http.Client();
+
+  static const _treeUrl = '$baseUrl/statistics2/tree.json';
+  static const _getUrl = '$baseUrl/statistics2/get.json';
+
+  Map<String, String> _headers(String token) => {
+    'Authorization': 'OAuth $token',
+    'Accept': 'application/json',
+  };
+
+  /// Performs a GET and decodes the body as UTF-8 regardless of the
+  /// (missing) charset in the response headers.
+  Future<Map<String, dynamic>> _getJson(Uri uri, String token) async {
+    final (body, _) = await _getJsonWithHeaders(uri, token);
+    return body;
+  }
+
+  Future<(Map<String, dynamic>, Map<String, String>)> _getJsonWithHeaders(
+    Uri uri,
+    String token,
+  ) async {
+    http.Response response;
+    try {
+      response = await _client
+          .get(uri, headers: _headers(token))
+          .timeout(const Duration(seconds: 40));
+    } on SocketException catch (e) {
+      throw ApiException(0, e.message);
+    } on TimeoutException {
+      throw const ApiException(0, 'Request timed out');
+    } on HttpException catch (e) {
+      throw ApiException(0, e.message);
+    } on FormatException catch (e) {
+      throw ApiException(0, e.message);
+    }
+    final text = utf8.decode(response.bodyBytes, allowMalformed: true);
+    if (response.statusCode != 200) {
+      throw ApiException(
+        response.statusCode,
+        extractErrorMessage(text) ?? 'HTTP ${response.statusCode}',
+      );
+    }
+    final decoded = json.decode(text);
+    if (decoded is! Map<String, dynamic>) {
+      throw const ApiException(0, 'Unexpected response');
+    }
+    if (decoded['result'] == 'error') {
+      throw ApiException(400, (decoded['message'] as String?) ?? 'API error');
+    }
+    return (decoded, response.headers);
+  }
+
+  /// Reads `{"errors":[{"code","title","detail"}]}` or
+  /// `{"result":"error","message":...}` bodies.
+  static String? extractErrorMessage(String body) {
+    try {
+      final decoded = json.decode(body);
+      if (decoded is Map) {
+        final errors = decoded['errors'];
+        if (errors is List && errors.isNotEmpty && errors.first is Map) {
+          final e = errors.first as Map;
+          final detail = e['detail']?.toString();
+          final title = e['title']?.toString();
+          if (detail != null && detail.isNotEmpty) return detail;
+          if (title != null && title.isNotEmpty) return title;
+        }
+        final message = decoded['message'];
+        if (message is String && message.isNotEmpty) return message;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  /// Validates a token with the cheapest call available and returns the
+  /// Yandex login the API reports for it (used as the default account label).
+  Future<String?> validateToken(String token) async {
+    final uri = Uri.parse('$_treeUrl?lang=en&stat_type=main');
+    final (_, headers) = await _getJsonWithHeaders(uri, token);
+    final login = headers['x-yandex-login'];
+    return login == null || login.isEmpty ? null : login;
+  }
+
+  Future<TreeCatalog> fetchCatalog(
+    String token, {
+    String lang = 'ru',
+    String statType = 'main',
+  }) async {
+    final uri = Uri.parse('$_treeUrl?lang=$lang&stat_type=$statType');
+    final body = await _getJson(uri, token);
+    final tree = (body['data'] as Map<String, dynamic>?)?['tree'];
+    if (tree is! List || tree.isEmpty || tree.first is! Map<String, dynamic>) {
+      return const TreeCatalog.empty();
+    }
+    return TreeCatalog.fromTreeJson(tree.first as Map<String, dynamic>);
+  }
+
+  Uri buildReportUri({
+    required ReportPeriod period,
+    required List<String> fields,
+    Map<String, String> dimensionFields = const {},
+    List<String> entityFields = const [],
+    List<ReportFilter> filters = const [],
+    OrderBy? orderBy,
+    int limit = 50,
+    int offset = 0,
+    String lang = 'ru',
+    String currency = 'RUB',
+    bool vat = false,
+    String statType = 'main',
+  }) {
+    final params = <String>[
+      'lang=$lang',
+      'stat_type=$statType',
+      'currency=$currency',
+      'vat=${vat ? 'true' : 'false'}',
+      ...period.toQuery(),
+      for (final f in fields) 'field=${Uri.encodeQueryComponent(f)}',
+      for (final e in dimensionFields.entries)
+        'dimension_field=${Uri.encodeQueryComponent('${e.key}|${e.value}')}',
+      for (final e in entityFields)
+        'entity_field=${Uri.encodeQueryComponent(e)}',
+      'limits=${Uri.encodeQueryComponent(jsonEncode({'limit': limit, 'offset': offset}))}',
+    ];
+    if (orderBy != null) {
+      params.add(
+        'order_by=${Uri.encodeQueryComponent(jsonEncode([orderBy.toJson()]))}',
+      );
+    }
+    final filterJson = ReportFilter.combine(filters);
+    if (filterJson != null) {
+      params.add('filter=${Uri.encodeQueryComponent(jsonEncode(filterJson))}');
+    }
+    return Uri.parse('$_getUrl?${params.join('&')}');
+  }
+
+  Future<ReportResponse> fetchReport({
+    required String token,
+    required ReportPeriod period,
+    required List<String> fields,
+    Map<String, String> dimensionFields = const {},
+    List<String> entityFields = const [],
+    List<ReportFilter> filters = const [],
+    OrderBy? orderBy,
+    int limit = 50,
+    int offset = 0,
+    String lang = 'ru',
+    String currency = 'RUB',
+    bool vat = false,
+    String statType = 'main',
+  }) async {
+    final uri = buildReportUri(
+      period: period,
+      fields: fields,
+      dimensionFields: dimensionFields,
+      entityFields: entityFields,
+      filters: filters,
+      orderBy: orderBy,
+      limit: limit,
+      offset: offset,
+      lang: lang,
+      currency: currency,
+      vat: vat,
+      statType: statType,
+    );
+    final body = await _getJson(uri, token);
+    return ReportResponse.fromJson(body);
+  }
+
+  /// 90 days of daily totals: the single request behind every KPI card.
+  Future<ReportResponse> fetchDailySeries({
+    required String token,
+    String lang = 'ru',
+    String currency = 'RUB',
+    bool vat = false,
+  }) => fetchReport(
+    token: token,
+    period: const ReportPeriod.preset(PeriodPreset.days90),
+    fields: DashMetrics.daily,
+    dimensionFields: const {'date': 'day'},
+    orderBy: const OrderBy('date', desc: false),
+    limit: 100,
+    lang: lang,
+    currency: currency,
+    vat: vat,
+  );
+
+  /// Top apps / sites by revenue for a period.
+  Future<ReportResponse> fetchTopEntities({
+    required String token,
+    required ReportPeriod period,
+    String lang = 'ru',
+    String currency = 'RUB',
+    bool vat = false,
+    int limit = 10,
+  }) => fetchReport(
+    token: token,
+    period: period,
+    fields: DashMetrics.top,
+    entityFields: const ['page_caption', 'page_id'],
+    orderBy: const OrderBy(DashMetrics.revenue, desc: true),
+    limit: limit,
+    lang: lang,
+    currency: currency,
+    vat: vat,
+  );
+}

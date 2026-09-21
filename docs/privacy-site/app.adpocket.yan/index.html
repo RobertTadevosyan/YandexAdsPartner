@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdPocket — Политика конфиденциальности / Privacy Policy</title>
+<meta name="description" content="Политика конфиденциальности приложения AdPocket (app.adpocket.yan) — мобильного клиента статистики Рекламной сети Яндекса.">
+<style>
+  :root{--fg:#14213d;--muted:#5b6b82;--accent:#8a6500;--bg:#fff;--card:#f5f6f8;--line:#e1e6ec}
+  @media (prefers-color-scheme:dark){:root{--fg:#f1f4f8;--muted:#b8c4d6;--accent:#ffc107;--bg:#102840;--card:#1a334d;--line:#2b4160}}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);max-width:760px;margin:0 auto;padding:32px 20px 64px;line-height:1.6}
+  h1{font-size:1.7rem;margin:.2rem 0 0} h2{font-size:1.2rem;margin-top:2rem;border-top:1px solid var(--line);padding-top:1.2rem}
+  h3{font-size:1rem;margin-bottom:.3rem}
+  .meta{color:var(--muted);font-size:.9rem}
+  .lang{display:flex;gap:8px;margin:18px 0}
+  .lang a{padding:6px 14px;border:1px solid var(--line);border-radius:20px;text-decoration:none;color:var(--fg);font-weight:600}
+  .lang a.on{background:var(--accent);color:#102840;border-color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:.95rem} td,th{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)} code{background:var(--card);padding:1px 5px;border-radius:4px}
+  .card{background:var(--card);border-radius:12px;padding:14px 16px;margin:14px 0}
+  a{color:var(--accent)}
+  [hidden]{display:none}
+</style>
+</head>
+<body>
+<p class="meta">app.adpocket.yan · Android / iOS</p>
+<h1>AdPocket</h1>
+<div class="lang"><a href="#ru" id="tab-ru" class="on">Русский</a><a href="#en" id="tab-en">English</a></div>
+
+<!-- ======================= RU ======================= -->
+<section id="ru">
+<h2 style="border:0;padding-top:0">Политика конфиденциальности</h2>
+<p class="meta">Последнее обновление: 21 сентября 2026 г.</p>
+
+<div class="card">
+<strong>Коротко.</strong> AdPocket — независимое приложение для просмотра статистики Рекламной сети Яндекса (РСЯ). Оно не имеет собственного сервера. Ваш OAuth‑токен и все данные статистики хранятся только на вашем устройстве и передаются только в API Яндекса. Приложение не содержит рекламы, аналитики и трекеров и не передаёт данные разработчику или третьим лицам.
+</div>
+
+<p>AdPocket <strong>не является официальным приложением Яндекса</strong>. Яндекс, Рекламная сеть Яндекса и связанные товарные знаки принадлежат ООО «Яндекс».</p>
+
+<h3>1. Кто обрабатывает данные</h3>
+<p>Разработчик приложения (далее «мы») — физическое лицо, контакт указан в разделе 10. Приложение работает полностью на устройстве пользователя; мы не получаем доступ к вашим данным, не видим их и не храним.</p>
+
+<h3>2. Какие данные использует приложение и где они хранятся</h3>
+<table>
+<tr><th>Данные</th><th>Зачем</th><th>Где хранятся</th></tr>
+<tr><td>OAuth‑токен API статистики РСЯ (один на каждый добавленный аккаунт)</td><td>Запросы статистики к API Яндекса от вашего имени</td><td>Только на устройстве: Android Keystore / iOS Keychain (защищённое хранилище системы). На iOS токен доступен также виджету приложения через общую группу Keychain.</td></tr>
+<tr><td>OAuth‑токен Inventory API (необязательно)</td><td>Управление рекламными блоками в разделе «Блоки»</td><td>Только на устройстве, защищённое хранилище системы</td></tr>
+<tr><td>Название аккаунта (метка, которую вы задаёте, или логин Яндекса, полученный из заголовка ответа API)</td><td>Различать несколько аккаунтов</td><td>Только на устройстве</td></tr>
+<tr><td>Статистика (доход, показы, клики, отчёты) и её кэш</td><td>Отображение на экранах и в виджете</td><td>Только на устройстве; на iOS — также в общем контейнере App Group для виджета</td></tr>
+<tr><td>Настройки: язык, валюта, НДС, тема, блокировка, параметры виджета, сохранённые шаблоны отчётов</td><td>Работа приложения</td><td>Только на устройстве</td></tr>
+</table>
+<p>Приложение <strong>не собирает</strong> и не хранит: имя, e‑mail, номер телефона, геолокацию, контакты, идентификаторы рекламы, данные об использовании, отчёты об ошибках. У приложения нет учётных записей на нашей стороне.</p>
+
+<h3>3. Кому передаются данные</h3>
+<p>Единственный получатель сетевых запросов — серверы Яндекса: <code>partner2.yandex.ru</code> и <code>partner.yandex.ru</code> (API Рекламной сети Яндекса). В каждом запросе передаётся ваш OAuth‑токен в заголовке <code>Authorization</code>, а также параметры отчёта (период, показатели, фильтры, язык, валюта). Обработка данных Яндексом регулируется его документами: <a href="https://yandex.ru/legal/partner_interface_api/">Пользовательское соглашение API Партнёрского интерфейса</a> и <a href="https://yandex.ru/legal/confidential/">Политика конфиденциальности Яндекса</a>.</p>
+<p>Мы не передаём данные никому другому. В приложении нет SDK аналитики, рекламных SDK, сервисов сбора ошибок и push‑серверов.</p>
+
+<h3>4. Разрешения и функции устройства</h3>
+<ul>
+<li><strong>Интернет</strong> — запросы к API Яндекса.</li>
+<li><strong>Биометрия / код устройства</strong> (Android USE_BIOMETRIC, iOS Face ID / Touch ID) — только если вы включите «Блокировку приложения». Биометрические данные обрабатываются операционной системой и не передаются приложению.</li>
+<li><strong>Виджет главного экрана</strong> — показывает кэшированную статистику; на Android при включённом «Фоновом обновлении» приложение примерно каждые 30 минут запрашивает статистику у API Яндекса; на iOS виджет обновляет данные сам по расписанию системы.</li>
+<li><strong>Оптимизация батареи</strong> (Android) — по вашему согласию приложение открывает системный список оптимизации батареи, чтобы вы могли исключить AdPocket и фоновое обновление виджета не останавливалось. Специальных разрешений для этого не запрашивается.</li>
+<li><strong>Уведомления</strong> — локальные, формируются на устройстве по вашему расписанию; серверы push‑уведомлений не используются.</li>
+</ul>
+
+<h3>5. Сроки хранения и удаление</h3>
+<p>Данные хранятся на устройстве, пока вы пользуетесь приложением. Удалить аккаунт и его токен можно в «Настройки → Аккаунты → Удалить аккаунт»; кэш отчётов — «Очистить кэш отчётов». Удаление приложения удаляет все его данные. Отозвать токен на стороне Яндекса можно в интерфейсе partner.yandex.ru.</p>
+
+<h3>6. Безопасность</h3>
+<p>Токены хранятся в защищённом хранилище операционной системы, все запросы идут по HTTPS. Мы рекомендуем включить «Блокировку приложения», если устройством пользуется кто‑то ещё. Мы не можем восстановить токен или данные — у нас их нет.</p>
+
+<h3>7. Дети</h3>
+<p>Приложение предназначено для партнёров Рекламной сети Яндекса и не адресовано лицам младше 18 лет.</p>
+
+<h3>8. Ваши права</h3>
+<p>Поскольку данные находятся только на вашем устройстве, вы полностью контролируете их: просмотр, изменение и удаление доступны в приложении. Если у вас есть вопросы о данных, обрабатываемых Яндексом, обратитесь в поддержку РСЯ.</p>
+
+<h3>9. Изменения политики</h3>
+<p>При изменении практики обработки данных мы обновим эту страницу и дату «Последнее обновление». Существенные изменения будут отмечены в описании обновления приложения.</p>
+
+<h3>10. Контакты</h3>
+<p>Вопросы по политике: <a href="mailto:robtdyn@gmail.com">robtdyn@gmail.com</a>. Исходный код приложения: <a href="https://github.com/RobertTadevosyan/YandexAdsPartner">github.com/RobertTadevosyan/YandexAdsPartner</a>.</p>
+</section>
+
+<!-- ======================= EN ======================= -->
+<section id="en" hidden>
+<h2 style="border:0;padding-top:0">Privacy Policy</h2>
+<p class="meta">Last updated: 21 September 2026</p>
+
+<div class="card">
+<strong>In short.</strong> AdPocket is an independent app for viewing Yandex Advertising Network (YAN) statistics. It has no server of its own. Your OAuth token and all statistics stay on your device and are sent only to Yandex's API. The app contains no ads, analytics or trackers and sends nothing to the developer or any third party.
+</div>
+
+<p>AdPocket is <strong>not an official Yandex application</strong>. Yandex, Yandex Advertising Network and related trademarks belong to Yandex LLC.</p>
+
+<h3>1. Who processes the data</h3>
+<p>The app developer ("we") is an individual; contact details are in section 10. The app runs entirely on your device; we do not receive, see or store your data.</p>
+
+<h3>2. What data the app uses and where it is stored</h3>
+<table>
+<tr><th>Data</th><th>Purpose</th><th>Where it is stored</th></tr>
+<tr><td>Statistics API OAuth token (one per account you add)</td><td>Requesting statistics from Yandex's API on your behalf</td><td>On the device only: Android Keystore / iOS Keychain. On iOS the token is also readable by the app's widget through a shared Keychain access group.</td></tr>
+<tr><td>Inventory API OAuth token (optional)</td><td>Managing ad units on the "Ad units" tab</td><td>On the device only, system secure storage</td></tr>
+<tr><td>Account label (a name you type, or the Yandex login returned in an API response header)</td><td>Telling several accounts apart</td><td>On the device only</td></tr>
+<tr><td>Statistics (revenue, impressions, clicks, reports) and their cache</td><td>Display on screens and in the widget</td><td>On the device only; on iOS also in the shared App Group container for the widget</td></tr>
+<tr><td>Settings: language, currency, VAT, theme, app lock, widget options, saved report presets</td><td>App operation</td><td>On the device only</td></tr>
+</table>
+<p>The app does <strong>not</strong> collect or store your name, e‑mail, phone number, location, contacts, advertising identifiers, usage data or crash reports. There are no accounts on our side.</p>
+
+<h3>3. Who receives data</h3>
+<p>The only recipients of network requests are Yandex servers: <code>partner2.yandex.ru</code> and <code>partner.yandex.ru</code> (Yandex Advertising Network API). Each request carries your OAuth token in the <code>Authorization</code> header plus report parameters (period, metrics, filters, language, currency). Yandex's handling of that data is governed by its own documents: the <a href="https://yandex.ru/legal/partner_interface_api/">Partner Interface API User Agreement</a> and the <a href="https://yandex.ru/legal/confidential/">Yandex Privacy Policy</a>.</p>
+<p>We share data with no one else. The app contains no analytics SDKs, advertising SDKs, crash reporters or push servers.</p>
+
+<h3>4. Permissions and device features</h3>
+<ul>
+<li><strong>Internet</strong> — requests to Yandex's API.</li>
+<li><strong>Biometrics / device credential</strong> (Android USE_BIOMETRIC, iOS Face ID / Touch ID) — only if you enable "App lock". Biometric data is handled by the operating system and never reaches the app.</li>
+<li><strong>Home-screen widget</strong> — shows cached statistics; on Android, with "Background refresh" on, the app asks Yandex's API for statistics about every 30 minutes; on iOS the widget refreshes itself on the system's schedule.</li>
+<li><strong>Battery optimisation</strong> (Android) — with your consent the app opens the system battery-optimisation list so you can exclude AdPocket and keep the widget's background refresh running. No special permission is requested for this.</li>
+<li><strong>Notifications</strong> — local, generated on the device on your schedule; no push servers are used.</li>
+</ul>
+
+<h3>5. Retention and deletion</h3>
+<p>Data stays on the device for as long as you use the app. Remove an account and its token via Settings → Accounts → Remove account; clear cached reports via "Clear report cache". Uninstalling the app deletes all its data. You can revoke the token on Yandex's side in the partner.yandex.ru interface.</p>
+
+<h3>6. Security</h3>
+<p>Tokens live in the operating system's secure store and all requests use HTTPS. We recommend enabling "App lock" if others use your device. We cannot recover tokens or data because we never have them.</p>
+
+<h3>7. Children</h3>
+<p>The app is intended for Yandex Advertising Network partners and is not directed at anyone under 18.</p>
+
+<h3>8. Your rights</h3>
+<p>Because the data exists only on your device, you control it fully: viewing, changing and deleting are available in the app. For questions about data processed by Yandex, contact YAN support.</p>
+
+<h3>9. Changes to this policy</h3>
+<p>If data practices change we will update this page and the "Last updated" date. Material changes will be noted in the app's release notes.</p>
+
+<h3>10. Contact</h3>
+<p>Questions about this policy: <a href="mailto:robtdyn@gmail.com">robtdyn@gmail.com</a>. Source code: <a href="https://github.com/RobertTadevosyan/YandexAdsPartner">github.com/RobertTadevosyan/YandexAdsPartner</a>.</p>
+</section>
+
+<script>
+(function(){
+  var ru=document.getElementById('ru'),en=document.getElementById('en'),tr=document.getElementById('tab-ru'),te=document.getElementById('tab-en');
+  function show(l){var e=l==='en';en.hidden=!e;ru.hidden=e;te.classList.toggle('on',e);tr.classList.toggle('on',!e);document.documentElement.lang=l;}
+  tr.onclick=function(ev){ev.preventDefault();show('ru');history.replaceState(null,'','#ru');};
+  te.onclick=function(ev){ev.preventDefault();show('en');history.replaceState(null,'','#en');};
+  var h=location.hash.replace('#',''); if(h==='en'||h==='ru'){show(h);} else if(!/^ru/i.test(navigator.language||'')){show('en');}
+})();
+</script>
+</body>
+</html>

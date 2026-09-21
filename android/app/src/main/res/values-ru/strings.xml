@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">Доход за сегодня, изменение к вчера и тренд за 7 дней из Рекламной сети Яндекса.</string>
+    <string name="widget_refresh">Обновить</string>
+</resources>
