@@ -8,7 +8,7 @@
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>group.app.adpocket.yan</string>
+		<string>$(AppIdentifierPrefix)app.adpocket.yan</string>
 	</array>
 </dict>
 </plist>
