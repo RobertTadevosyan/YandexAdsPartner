@@ -1,5 +1,5 @@
-name: yapartner
-description: "A new Flutter project."
+name: adpocket
+description: "Mobile companion for the Yandex Advertising Network partner dashboard."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.2.0+3
 
 environment:
   sdk: ^3.7.2
@@ -30,19 +30,33 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.3.0
-  fl_chart: ^0.63.0 
-  shared_preferences: ^2.2.2 
-  flutter_launcher_icons: ^0.13.1
-  mockito: ^5.4.2
-  build_runner: ^2.4.6
+  flutter_localizations:
+    sdk: flutter
+  http: ^1.6.0
+  fl_chart: ^1.2.0
+  shared_preferences: ^2.5.3
+  intl: any
+  provider: ^6.1.2
+  share_plus: ^11.0.0
+  url_launcher: ^6.3.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  flutter_secure_storage: ^10.3.4
+  local_auth: ^3.0.2
+  home_widget: ^0.10.0
+  workmanager: ^0.10.10
+  flutter_local_notifications: ^22.3.1
+  timezone: ^0.11.1
+  flutter_timezone: ^5.1.0
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito: ^5.4.6
+  build_runner: ^2.4.15
+  flutter_launcher_icons: ^0.14.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -53,10 +67,15 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/icon.png" 
+  image_path: "assets/icons/icon.png"
+  adaptive_icon_background: "#102840"
+  adaptive_icon_foreground: "assets/icons/icon_foreground.png"
+  adaptive_icon_monochrome: "assets/icons/icon_monochrome.png"
+  remove_alpha_ios: true
+  min_sdk_android: 24
 # The following section is specific to Flutter packages.
 flutter:
 
@@ -95,3 +114,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# workmanager_apple 0.9.11 references iOS 26-only types and fails to compile on
+# Xcode 16. This vendored copy guards them with compiler checks. Remove once the
+# upstream package does the same or the build machines run Xcode 26.
+dependency_overrides:
+  workmanager_apple:
+    path: packages/workmanager_apple

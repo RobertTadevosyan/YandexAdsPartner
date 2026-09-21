@@ -1,14 +1,16 @@
+/// A field from the statistics tree: a metric, a dimension group
+/// (date / geo), or an entity field (app, block, OS ...).
 class TreeField {
   final String id;
   final String title;
-  final String source; // 'indicator', 'entity_group', 'dimension_group'
+  final String source; // fields | dimension_fields | entity_fields
   final String type;
   final String unit;
   final String hint;
   final String? categoryName;
   final int category;
   final int index;
-  final List<List<String>>? values; // For dimension groups
+  final List<List<String>>? values; // For dimension groups: [[id, label], ...]
   String? selectedChildId;
 
   TreeField({
@@ -32,24 +34,35 @@ class TreeField {
   bool operator ==(Object other) =>
       identical(this, other) || other is TreeField && id == other.id;
 
-  bool isSelection() {
-    return type == kTypeSelect;
+  bool get isMetric => source == kSourceFields || source == kSourceIndicators;
+  bool get isDimension => source == kSourceDimension;
+  bool get isEntity => source == kSourceEntityFields;
+  bool isSelection() => type == kTypeSelect;
+
+  /// Label of the currently selected child (e.g. "by day") for dimensions.
+  String? get selectedChildLabel {
+    if (values == null || selectedChildId == null) return null;
+    for (final v in values!) {
+      if (v.isNotEmpty && v[0] == selectedChildId) {
+        return v.length > 1 ? v[1] : v[0];
+      }
+    }
+    return null;
   }
 
-  static TreeField fallback() {
-    return TreeField(
-      id: kKeyId,
-      title: kKeyTitle,
-      source: kKeySource,
-      type: kKeyType,
-      unit: kKeyUnit,
-      hint: kKeyHint,
-      categoryName: kKeyCategoryName,
-      category: -1,
-      index: -1,
-      selectedChildId: null,
-    );
-  }
+  TreeField copy({String? selectedChildId}) => TreeField(
+    id: id,
+    title: title,
+    source: source,
+    type: type,
+    unit: unit,
+    hint: hint,
+    categoryName: categoryName,
+    category: category,
+    index: index,
+    values: values,
+    selectedChildId: selectedChildId ?? this.selectedChildId,
+  );
 
   Map<String, dynamic> toJson() {
     return {
@@ -72,40 +85,41 @@ class TreeField {
     List<List<String>>? parsedValues;
 
     if (rawValues is List) {
-      parsedValues = rawValues.map<List<String>>((item) {
-        if (item is List) {
-          return item.map((e) => e.toString()).toList();
-        }
-        return [];
-      }).toList();
+      parsedValues =
+          rawValues.map<List<String>>((item) {
+            if (item is List) {
+              return item.map((e) => e.toString()).toList();
+            }
+            return [];
+          }).toList();
     }
 
     final savedSource = (json[kKeySource] as String?) ?? '';
     return TreeField(
-      id: (json[kKeyId] as String?) ?? '',
+      id: (json[kKeyId] as String?) ?? (json['name'] as String?) ?? '',
       title: (json[kKeyLabel] as String?) ?? (json[kKeyTitle] as String?) ?? '',
       source: savedSource.isNotEmpty ? savedSource : source,
       type: (json[kKeyType] as String?) ?? '',
       unit: (json[kKeyUnit] as String?) ?? '',
       hint: (json[kKeyHint] as String?) ?? '',
       categoryName: (json[kKeyCategoryName] as String?) ?? '',
-      category: json[kKeyCategory] as int,
-      index: json[kKeyIndex] as int,
-      selectedChildId: json[kKeySelectedChildId],
+      category: (json[kKeyCategory] as num?)?.toInt() ?? -1,
+      index: (json[kKeyIndex] as num?)?.toInt() ?? -1,
+      selectedChildId: json[kKeySelectedChildId] as String?,
       values: parsedValues,
     );
   }
 
   static TreeField fromDimension(Map<String, dynamic> group) {
-    final groupTitle = group[kKeyTitle] ?? kDefaultGroupTitle;
-    final groupType = group[kKeyType] ?? kTypeSelect;
-    final groupId = group[kKeyId] ?? 'date';
+    final groupTitle = (group[kKeyTitle] as String?) ?? kDefaultGroupTitle;
+    final groupType = (group[kKeyType] as String?) ?? kTypeSelect;
+    final groupId = (group[kKeyId] as String?) ?? 'date';
 
     final values = <List<String>>[];
     if (group[kKeyValues] is List) {
       for (var val in group[kKeyValues]) {
         if (val is List && val.length == 2) {
-          values.add([val[0], val[1]]);
+          values.add([val[0].toString(), val[1].toString()]);
         }
       }
     }
@@ -125,27 +139,23 @@ class TreeField {
     );
   }
 
-  // Constants for JSON keys and source types
-static const String kKeyId = 'id';
-static const String kKeyTitle = 'title';
-static const String kKeyLabel = 'label';
-static const String kKeySource = 'source';
-static const String kKeyType = 'type';
-static const String kKeyUnit = 'unit';
-static const String kKeyHint = 'hint';
-static const String kKeyCategoryName = 'category_name';
-static const String kKeyCategory = 'category';
-static const String kKeyIndex = 'index';
-static const String kKeyValues = 'values';
-static const String kKeySelectedChildId = 'selectedChildId';
+  static const String kKeyId = 'id';
+  static const String kKeyTitle = 'title';
+  static const String kKeyLabel = 'label';
+  static const String kKeySource = 'source';
+  static const String kKeyType = 'type';
+  static const String kKeyUnit = 'unit';
+  static const String kKeyHint = 'hint';
+  static const String kKeyCategoryName = 'category_name';
+  static const String kKeyCategory = 'category';
+  static const String kKeyIndex = 'index';
+  static const String kKeyValues = 'values';
+  static const String kKeySelectedChildId = 'selectedChildId';
 
-static const String kSourceDimension = 'dimension_fields';
-static const String kSourceIndicators = 'indicators';
-static const String kSourceFields = 'fields';
-static const String kSourceEntityFields = 'entity_fields';
-static const String kSourceEntityFilterFields = 'entity_filter_fields';
-static const String kSourceEntityFilterSimpleFields = 'entity_filter_simple_fields';
-static const String kTypeSelect = 'select';
-static const String kDefaultGroupTitle = 'Без категории';
-
+  static const String kSourceDimension = 'dimension_fields';
+  static const String kSourceIndicators = 'indicators';
+  static const String kSourceFields = 'fields';
+  static const String kSourceEntityFields = 'entity_fields';
+  static const String kTypeSelect = 'select';
+  static const String kDefaultGroupTitle = 'Без категории';
 }

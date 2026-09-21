@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;font-family:-apple-system,"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+  body{background:radial-gradient(120% 90% at 15% 0%,#1d3d63 0%,#102840 55%,#0b1c30 100%);color:#fff;position:relative;display:flex;flex-direction:column;align-items:center}
+  .glow{position:absolute;width:70vw;height:70vw;border-radius:50%;background:radial-gradient(circle,rgba(255,193,7,.28) 0%,rgba(255,193,7,0) 65%);filter:blur(2px)}
+  .g1{left:-20vw;top:38vh}.g2{right:-28vw;top:-12vh;width:60vw;height:60vw;background:radial-gradient(circle,rgba(79,195,247,.22) 0%,rgba(79,195,247,0) 65%)}
+  .head{position:relative;width:88%;margin-top:4vh;text-align:center;z-index:2;flex:0 0 auto}
+  .kicker{display:inline-block;background:#FFC107;color:#102840;font-weight:800;font-size:1.55vh;letter-spacing:.08em;padding:.5vh 1.4vh;border-radius:2vh;text-transform:uppercase}
+  h1{font-size:3.2vh;line-height:1.15;font-weight:800;margin:1.2vh 0 0;letter-spacing:-.01em}
+  p{font-size:1.8vh;line-height:1.35;color:#c9d6e6;margin:.9vh auto 0;max-width:92%}
+  .foot{display:block;margin-top:1.2vh;font-size:1.35vh;color:rgba(201,214,230,.55);letter-spacing:.04em}
+  /* Device shell. --ar is screen aspect, --w the shell width, --r corner radius. */
+  .device{position:relative;margin-top:2.4vh;flex:0 0 auto;width:var(--w);aspect-ratio:var(--ar);border-radius:var(--r);background:#0a1626;overflow:hidden;
+    box-shadow:0 3vh 8vh rgba(0,0,0,.55),0 0 0 var(--bezel) #1f3654,0 0 0 calc(var(--bezel) * 1.9) #0d1b2c}
+  .device img{position:absolute;left:0;top:calc(-1 * var(--crop));width:100%;height:auto}
+  .island{position:absolute;left:50%;top:1.6vw;transform:translateX(-50%);width:22vw;height:4.2vw;background:#0a1626;border-radius:3vw;z-index:3}
+  /* Android phone capture from the emulator (status bar cropped off the top). */
+  body[data-device="phone"] .device{--w:84vw;--ar:1080/2300;--r:7vw;--bezel:.6vw;--crop:5.6%}
+  body[data-device="phone"] .device img{left:-0.4%;width:100.8%}
+  /* iPhone 6.7": rendered at 1290x2796, no status bar, dynamic island drawn. */
+  body[data-device="iphone"] .device{--w:84vw;--ar:1290/2796;--r:9vw;--bezel:.7vw;--crop:0%}
+  body[data-device="iphone"] .island{width:24vw;height:5vw;top:2vw}
+  /* iPad 13": rendered at 2064x2752, thin uniform bezel, no island. */
+  body[data-device="ipad"] .device{--w:86vw;--ar:2064/2752;--r:3.5vw;--bezel:1.1vw;--crop:0%;margin-top:2vh}
+  body[data-device="ipad"] .island{display:none}
+  /* Android 10" tablet, landscape canvas: shell sized by height. */
+  body[data-device="tablet"] .device{--ar:2560/1600;--r:3.2vh;--bezel:1.1vh;--crop:0%;width:auto;height:62vh;margin-top:2vh}
+  body[data-device="tablet"] .island{display:none}
+  body[data-device="tablet"] .head{margin-top:3vh}
+  body[data-device="tablet"] h1{font-size:5.2vh}
+  body[data-device="tablet"] p{font-size:2.8vh}
+  body[data-device="tablet"] .kicker{font-size:2.4vh}
+  body[data-device="tablet"] .foot{font-size:2vh}
+  /* iOS widget: the real WidgetKit view rendered to PNG, shown on a home-screen backdrop. */
+  body[data-device="widget-ios"] .device{--w:84vw;--ar:1290/2796;--r:9vw;--bezel:.7vw;--crop:0%;background:linear-gradient(160deg,#1b2a44 0%,#0b1626 60%,#050b14 100%)}
+  body[data-device="widget-ios"] .device img.shot{display:none}
+  .wimg{display:none}
+  body[data-device="widget-ios"] .wimg{display:block;position:absolute;left:6%;top:11%;width:88%;height:auto;border-radius:5vw;box-shadow:0 2vh 5vh rgba(0,0,0,.5)}
+  body[data-device="widget-ios"] .clock{display:block;position:absolute;left:0;right:0;top:4.2%;text-align:center;font-size:7.5vw;font-weight:300;color:#fff;letter-spacing:-.02em;opacity:.95}
+  .clock{display:none}
+  body[data-device="widget-ios"] .dock{display:flex;position:absolute;left:8%;right:8%;bottom:3%;height:11vw;border-radius:6vw;background:rgba(255,255,255,.14);backdrop-filter:blur(20px);justify-content:space-evenly;align-items:center}
+  .dock{display:none} .dock i{width:7.6vw;height:7.6vw;border-radius:2vw;background:rgba(255,255,255,.22)}
+</style>
+</head>
+<body data-device="phone">
+  <div class="glow g1"></div><div class="glow g2"></div>
+  <div class="head">
+    <span class="kicker" id="kicker">AdPocket</span>
+    <h1 id="title">Title</h1>
+    <p id="sub">Subtitle</p>
+    <span class="foot" id="foot"></span>
+  </div>
+  <div class="device"><div class="island"></div><span class="clock">9:41</span><img class="shot" id="shot" src=""><img class="wimg" id="wimg" src=""><div class="dock"><i></i><i></i><i></i><i></i></div></div>
+  <script>
+    const q=new URLSearchParams(location.search);
+    document.body.dataset.device=q.get('device')||'phone';
+    document.getElementById('title').textContent=q.get('t')||'';
+    document.getElementById('sub').textContent=q.get('s')||'';
+    document.getElementById('kicker').textContent=q.get('k')||'AdPocket';
+    document.getElementById('foot').textContent=q.get('f')||'';
+    document.getElementById('shot').src=q.get('img')||'';
+    document.getElementById('wimg').src=q.get('wimg')||'';
+  </script>
+</body>
+</html>
