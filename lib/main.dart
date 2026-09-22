@@ -16,8 +16,18 @@ import 'package:adpocket/theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting();
-  await WidgetService.initialize();
-  await NotificationService.initialize();
+  // Plugin set-up must never keep the first frame from rendering: a missing
+  // resource or a broken platform channel degrades one feature, not the app.
+  try {
+    await WidgetService.initialize();
+  } catch (e, st) {
+    debugPrint('widget init failed: $e\n$st');
+  }
+  try {
+    await NotificationService.initialize();
+  } catch (e, st) {
+    debugPrint('notification init failed: $e\n$st');
+  }
   final settings = await AppSettings.load();
   // Demo mode (build flag only) swaps the network client for synthetic data.
   AppSession session;
