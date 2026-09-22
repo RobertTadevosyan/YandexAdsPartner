@@ -27,6 +27,38 @@ icon_512.png                   512×512 Play store icon (App Store uses the 1024
 tools/                         HTML templates and the build script
 ```
 
+## Promo video
+
+`video/` holds a 26-second promo built from the real UI: the overview cards fly
+in and assemble on an iPhone, the page scrolls, swipes to Reports, opens the
+accounts sheet, shows the home-screen widget and closes on the logo.
+
+```
+video/en_promo_1080x1920.mp4      Google Play (upload to YouTube, link in the listing)
+video/ru_promo_1080x1920.mp4
+video/en_preview_886x1920.mp4     App Store app preview, 6.7"/6.5" iPhone
+video/ru_preview_886x1920.mp4
+video/src/                         3x renders from test/video_renders_test.dart
+video/layers/                      card slices produced by tools/video/prep.py
+```
+
+Rebuild:
+
+```
+flutter test --dart-define=VIDEO_SHOTS=true --dart-define=STORE_SHOTS=true \
+  --dart-define=ADPOCKET_DEMO=true --dart-define=ADPOCKET_DEMO_PROFILE=store \
+  test/video_renders_test.dart
+cd docs/store/tools/video && python3 prep.py            # needs Pillow
+npm i puppeteer-core && pip3 install imageio-ffmpeg       # once
+node render.js --lang en --out ../../video/en_promo_1080x1920.mp4
+node render.js --lang en --w 886 --h 1920 --out ../../video/en_preview_886x1920.mp4
+```
+
+`promo.html` is the storyboard: every element is a pure function of time
+(`window.seek(t)`), so frames are deterministic. Open it in a browser with
+`?lang=ru&t=8.5` to inspect a moment. Google Play accepts only a YouTube link;
+App Store previews are uploaded per device size in App Store Connect.
+
 ## Google Play Console checklist
 | Field | Value |
 |---|---|

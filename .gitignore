@@ -82,3 +82,7 @@ ios/.dart_tool/
 build/
 # golden-test diff output
 test/failures/
+
+# promo video toolchain (installed per machine)
+docs/store/tools/video/node_modules/
+docs/store/tools/video/package*.json

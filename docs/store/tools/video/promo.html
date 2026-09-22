@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AdPocket promo</title>
+<style>
+  html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:#0b1c30;
+    font-family:-apple-system,"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:#fff}
+  /* Fixed 1080x1920 design box, scaled to the viewport height and centred. */
+  #stage{position:absolute;left:50%;top:0;width:1080px;height:1920px;transform-origin:top center;
+    background:radial-gradient(120% 90% at 15% 0%,#1d3d63 0%,#102840 55%,#0b1c30 100%);overflow:hidden}
+  .glow{position:absolute;width:760px;height:760px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,193,7,.30) 0%,rgba(255,193,7,0) 65%);filter:blur(2px)}
+  .abs{position:absolute;will-change:transform,opacity}
+  /* Intro / outro */
+  #logo{left:50%;top:50%;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:70px;
+    box-shadow:0 40px 90px rgba(0,0,0,.45)}
+  #logo img{width:100%;height:100%;display:block;border-radius:70px}
+  #word{left:0;right:0;top:calc(50% + 190px);text-align:center;font-size:96px;font-weight:800;letter-spacing:-.02em}
+  #tag{left:0;right:0;top:calc(50% + 320px);text-align:center;font-size:40px;color:#c9d6e6}
+  #outro1{left:0;right:0;top:calc(50% + 320px);text-align:center;font-size:40px;color:#e6edf6;font-weight:600}
+  #outro2{left:150px;right:150px;top:calc(50% + 400px);text-align:center;font-size:28px;line-height:1.35;color:#9fb1c8}
+  #stores{left:0;right:0;top:calc(50% + 520px);display:flex;justify-content:center;gap:28px}
+  .store{padding:18px 30px;border-radius:24px;background:rgba(255,255,255,.10);border:2px solid rgba(255,255,255,.22);font-size:30px;font-weight:700}
+  /* Captions */
+  #cap{left:130px;right:130px;top:150px;text-align:center}
+  #kick{display:inline-block;background:#FFC107;color:#102840;font-weight:800;font-size:26px;letter-spacing:.08em;
+    padding:10px 26px;border-radius:40px;text-transform:uppercase}
+  #h1{font-size:64px;line-height:1.12;font-weight:800;margin:22px 0 0;letter-spacing:-.01em}
+  #h2{font-size:34px;line-height:1.3;color:#c9d6e6;margin:16px auto 0}
+  /* Phone */
+  #phone{left:50%;top:470px;width:620px;height:1344px;margin-left:-310px;border-radius:92px;background:#0a1626;overflow:hidden;
+    box-shadow:0 60px 120px rgba(0,0,0,.6),0 0 0 9px #1f3654,0 0 0 17px #0d1b2c}
+  #screen{position:absolute;inset:0;overflow:hidden;background:#f5f6f8}
+  #ovHead,#rpHead{position:absolute;left:0;top:0;width:620px;z-index:4;will-change:transform,opacity}
+  #island{position:absolute;left:50%;top:22px;width:186px;height:54px;margin-left:-93px;border-radius:40px;background:#0a1626;z-index:9}
+  .layer{position:absolute;left:0;top:0;width:620px;will-change:transform,opacity}
+  .card{position:absolute;will-change:transform,opacity;transform-origin:center center}
+  #nav{position:absolute;left:0;bottom:0;width:620px;z-index:5}
+  #dim{position:absolute;inset:0;background:rgba(10,22,38,.55);z-index:6}
+  #sheet{position:absolute;left:0;bottom:0;width:620px;z-index:7}
+  #home{position:absolute;inset:0;background:linear-gradient(160deg,#1b2a44 0%,#0b1626 60%,#050b14 100%);z-index:8}
+  #clock{position:absolute;left:0;right:0;top:110px;text-align:center;font-size:118px;font-weight:300;letter-spacing:-.02em;opacity:.95}
+  #widget{position:absolute;left:36px;top:300px;width:548px;border-radius:44px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+  #dock{position:absolute;left:44px;right:44px;bottom:36px;height:120px;border-radius:60px;background:rgba(255,255,255,.14);
+    display:flex;justify-content:space-evenly;align-items:center}
+  #dock i{width:80px;height:80px;border-radius:22px;background:rgba(255,255,255,.22)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="glow abs" id="g1"></div><div class="glow abs" id="g2"></div>
+
+  <div class="abs" id="logo"><img src="../../icon_512.png" alt=""></div>
+  <div class="abs" id="word">AdPocket</div>
+  <div class="abs" id="tag"></div>
+  <div class="abs" id="outro1"></div>
+  <div class="abs" id="outro2"></div>
+  <div class="abs" id="stores"><span class="store">App Store</span><span class="store">Google Play</span></div>
+
+  <div class="abs" id="cap"><span id="kick">AdPocket</span><div id="h1"></div><div id="h2"></div></div>
+
+  <div class="abs" id="phone">
+    <div id="island"></div>
+    <div id="screen">
+      <img class="layer" id="ovBody" alt="">
+      <img class="layer" id="rpBody" alt="">
+      <div id="cards"></div>
+      <img id="ovHead" alt=""><img id="rpHead" alt="">
+      <img id="nav" alt="">
+      <div id="dim"></div>
+      <img id="sheet" alt="">
+      <div id="home"><div id="clock">9:41</div><img id="widget" src="../../screenshots/src/en_ioswidget.png" alt=""><div id="dock"><i></i><i></i><i></i><i></i></div></div>
+    </div>
+  </div>
+</div>
+<script>
+const q = new URLSearchParams(location.search);
+const LANG = q.get('lang') || 'en';
+const T = {
+  en: {
+    tag: 'Your YAN revenue, in your pocket',
+    s1: ['Your revenue today', 'Yesterday, the week and the month right next to it'],
+    s2: ['Trends at a glance', '30-day chart, period metrics, top apps and sites'],
+    s3: ['Any report from partner.yandex.ru', 'Filters, groupings, totals and CSV export'],
+    s4: ['Several accounts, one app', 'Switch with a tap, every account keeps its own data'],
+    s5: ['Widgets that refresh themselves', "Today's revenue on your home screen"],
+    o1: 'Private by design',
+    o2: 'No servers, no analytics, no ads · Not an official Yandex application',
+  },
+  ru: {
+    tag: 'Доход РСЯ в вашем кармане',
+    s1: ['Доход за сегодня', 'Вчера, неделя и месяц — рядом, для сравнения'],
+    s2: ['Динамика одним взглядом', 'График за 30 дней, показатели периода, топ приложений'],
+    s3: ['Любой отчёт из кабинета РСЯ', 'Фильтры, группировки, итоги, экспорт в CSV'],
+    s4: ['Несколько аккаунтов — одно приложение', 'Переключение одним касанием'],
+    s5: ['Виджет обновляется сам', 'Доход за сегодня на главном экране'],
+    o1: 'Приватно по замыслу',
+    o2: 'Без серверов, аналитики и рекламы · Неофициальное приложение, не связано с Яндексом',
+  },
+}[LANG];
+document.documentElement.lang = LANG;
+window.DURATION = 26;
+
+const K = 620 / 1290;                    // source px -> screen px
+const SRC_H = 2796, NAV_TOP = 2556, BODY_H = 5760, PAD = 24;
+const L = (n) => `../../video/layers/${LANG}_${n}.png`;
+document.getElementById('ovBody').src = L('overview_body');
+document.getElementById('rpBody').src = L('reports_body');
+document.getElementById('nav').src = L('nav');
+document.getElementById('ovHead').src = L('ovhead');
+document.getElementById('rpHead').src = L('rphead');
+document.getElementById('sheet').src = L('sheet');
+document.getElementById('widget').src = `../../screenshots/src/${LANG}_ioswidget.png`;
+document.getElementById('tag').textContent = T.tag;
+document.getElementById('outro1').textContent = T.o1;
+document.getElementById('outro2').textContent = T.o2;
+
+// Cards that fly in and assemble the overview: [name, x0, y0, x1, y1, fromX, fromY, rot]
+const CARDS = [
+  ['header', 48, 213, 1241, 308,    0, -900, -6],
+  ['hero',   48, 357, 1241, 929,  -1400, -300, -14],
+  ['kpi1',   48, 966, 629, 1331,  -1200, 500, -10],
+  ['kpi2',  660, 966, 1241, 1331,  1200, 300, 12],
+  ['kpi3',   48, 1362, 629, 1727, -900, 1200, 8],
+  ['kpi4',  660, 1362, 1241, 1727, 1100, 1100, -9],
+  ['chart',  48, 1776, 1241, 2567,  0, 1900, 5],
+];
+const cardsEl = document.getElementById('cards');
+const cardEls = CARDS.map(([name, x0, y0, x1, y1]) => {
+  const img = document.createElement('img');
+  img.className = 'card'; img.src = L(name);
+  img.style.left = (x0 - PAD) * K + 'px'; img.style.top = (y0 - PAD) * K + 'px';
+  img.style.width = (x1 - x0 + 1 + 2 * PAD) * K + 'px';
+  cardsEl.appendChild(img); return img;
+});
+
+// --- easing helpers -------------------------------------------------------
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const seg = (t, t0, t1, fn = easeOut) => fn(clamp((t - t0) / (t1 - t0)));
+const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+const easeIn = (x) => x * x * x;
+const easeInOut = (x) => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const backOut = (x) => { const c = 1.35; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const bounce = (x) => { const n = 7.5625, d = 2.75;
+  if (x < 1 / d) return n * x * x; if (x < 2 / d) return n * (x -= 1.5 / d) * x + .75;
+  if (x < 2.5 / d) return n * (x -= 2.25 / d) * x + .9375; return n * (x -= 2.625 / d) * x + .984375; };
+const lerp = (a, b, p) => a + (b - a) * p;
+const $ = (id) => document.getElementById(id);
+const set = (el, { x = 0, y = 0, s = 1, r = 0, o = 1 }) => {
+  el.style.transform = `translate(${x}px,${y}px) rotate(${r}deg) scale(${s})`; el.style.opacity = o; };
+const cap = (h1, h2, p) => { $('h1').textContent = h1; $('h2').textContent = h2;
+  set($('cap'), { y: lerp(40, 0, p), o: p }); };
+
+// --- timeline ------------------------------------------------------------
+window.seek = function (t) {
+  // background glows drift slowly
+  set($('g1'), { x: -180 + Math.sin(t * .35) * 60, y: -120 + Math.cos(t * .3) * 50 });
+  set($('g2'), { x: 560 + Math.cos(t * .28) * 70, y: 1250 + Math.sin(t * .33) * 60 });
+
+  // Scene A: intro 0-3s, outro 22.6-26s
+  const intro = seg(t, 0, .9), introOut = 1 - seg(t, 2.4, 3.0, easeIn);
+  const outro = seg(t, 23.0, 23.8);
+  const logoIn = t < 12 ? intro * introOut : outro;
+  set($('logo'), { s: t < 12 ? lerp(.6, 1, seg(t, 0, .9, backOut)) * lerp(1, .9, 1 - introOut) : lerp(.7, 1, seg(t, 23.0, 23.8, backOut)), o: logoIn, y: t < 12 ? 0 : -140 });
+  set($('word'), { o: t < 12 ? seg(t, .5, 1.2) * introOut : seg(t, 23.2, 23.9), y: t < 12 ? lerp(30, 0, seg(t, .5, 1.2)) : -140 + lerp(30, 0, seg(t, 23.2, 23.9)) });
+  set($('tag'), { o: t < 12 ? seg(t, .9, 1.6) * introOut : 0, y: lerp(30, 0, seg(t, .9, 1.6)) });
+  set($('outro1'), { o: seg(t, 23.6, 24.2), y: -140 + lerp(30, 0, seg(t, 23.6, 24.2)) });
+  set($('outro2'), { o: seg(t, 24.0, 24.6), y: -140 + lerp(30, 0, seg(t, 24.0, 24.6)) });
+  set($('stores'), { o: seg(t, 24.4, 25.0), y: -140 + lerp(30, 0, seg(t, 24.4, 25.0)) });
+
+  // Phone rises 2.6-3.6, shrinks away 22.6-23.4
+  const up = seg(t, 2.6, 3.6), away = seg(t, 22.6, 23.4, easeIn);
+  set($('phone'), { y: lerp(1500, 0, up) + away * 500, s: lerp(1, .8, away), o: 1 - away });
+
+  // Scene B: cards fly in 3.4-5.6
+  const assembled = t >= 7.2;
+  cardsEl.style.display = assembled ? 'none' : 'block';
+  CARDS.forEach(([, , , , , fx, fy, rot], i) => {
+    const p = seg(t, 3.4 + i * .14, 4.3 + i * .14, backOut);
+    set(cardEls[i], { x: lerp(fx, 0, p), y: lerp(fy, 0, p), r: lerp(rot, 0, p), s: lerp(1.12, 1, p), o: clamp(p * 3) });
+  });
+  const navP = seg(t, 4.5, 5.3, backOut);
+  const navInScene = t < 18.8;
+  const navSwap = seg(t, 11.0, 11.7);
+  $('nav').src = navSwap > .5 ? L('reports_nav') : L('nav');
+  set($('nav'), { y: navInScene ? lerp(400, 0, navP) : 0, o: navInScene ? clamp(navP * 2) : 0 });
+
+  // Scene C: real body scrolls 7.4-9.6
+  const scroll = lerp(0, 2450, seg(t, 7.4, 9.6, easeInOut));
+  const swipe = seg(t, 11.0, 11.7, easeInOut);
+  set($('ovBody'), { x: lerp(0, -620, swipe), y: -scroll * K, o: assembled ? 1 : 0 });
+  // Scene D: reports 11-15.5, scrolls 12.4-14.4
+  const rScroll = lerp(0, 1500, seg(t, 12.4, 14.4, easeInOut));
+  set($('rpBody'), { x: lerp(620, 0, swipe), y: -rScroll * K, o: assembled ? 1 : 0 });
+  set($('ovHead'), { x: lerp(0, -620, swipe), o: assembled ? 1 : 0 });
+  set($('rpHead'), { x: lerp(620, 0, swipe), o: assembled ? 1 : 0 });
+  // Scene E: accounts sheet 15.6-18.8
+  const sheetUp = seg(t, 15.6, 16.3, backOut) * (1 - seg(t, 18.3, 18.8, easeIn));
+  $('dim').style.opacity = sheetUp * 1;
+  set($('sheet'), { y: lerp(700, 0, sheetUp) });
+  // Scene F: home screen + widget 18.8-22.6
+  const homeIn = seg(t, 18.8, 19.4);
+  set($('home'), { o: homeIn });
+  const drop = seg(t, 19.3, 20.4, bounce);
+  set($('widget'), { y: lerp(-700, 0, drop), o: t >= 19.3 ? 1 : 0 });
+
+  // Captions
+  const SCHEDULE = [[4.6, 7.6, T.s1], [7.6, 11.2, T.s2], [11.2, 15.7, T.s3], [15.7, 19.0, T.s4], [19.0, 22.8, T.s5]];
+  const cur = SCHEDULE.find(([a, b]) => t >= a && t < b);
+  if (cur) cap(cur[2][0], cur[2][1], seg(t, cur[0], cur[0] + .5) * (1 - seg(t, cur[1] - .35, cur[1], easeIn)));
+  else set($('cap'), { o: 0 });
+};
+
+// Fit the 1080x1920 design box to the viewport height.
+function fit() {
+  const s = innerHeight / 1920;
+  $('stage').style.transform = `translateX(-50%) scale(${s})`;
+}
+addEventListener('resize', fit); fit(); seek(+(q.get('t') || 0));
+</script>
+</body>
+</html>
