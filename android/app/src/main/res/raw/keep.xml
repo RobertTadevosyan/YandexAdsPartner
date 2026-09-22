@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Resources referenced only by name from Dart; the release resource
+     shrinker cannot see those references and would drop them. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_notification,@drawable/ic_launcher_foreground,@mipmap/ic_launcher" />
