@@ -27,6 +27,13 @@ icon_512.png                   512×512 Play store icon (App Store uses the 1024
 tools/                         HTML templates and the build script
 ```
 
+## Ad units tab
+
+The Inventory API tab is hidden in store builds: Yandex issues that token to
+few partners and reviewers cannot exercise the tab. It appears automatically
+for a user who already holds an inventory token, and for development builds
+with `--dart-define=ADPOCKET_AD_UNITS=true`.
+
 ## Promo video
 
 `video/` holds a 26-second promo built from the real UI: the overview cards fly
