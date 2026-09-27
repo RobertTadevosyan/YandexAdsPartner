@@ -48,8 +48,8 @@ Open partner.yandex.ru, press the "API" button on the right panel, choose "Get O
 
 AdPocket is an independent application and is not affiliated with or endorsed by Yandex. Yandex and Yandex Advertising Network are trademarks of Yandex LLC.
 
-## What's new (release notes, 1.2.0)
-First public release: overview dashboard, full report builder with filters and export, home-screen widgets on Android and iOS, multiple accounts, local summaries and alerts, secure token storage and app lock.
+## What's new (release notes, 1.2.1)
+Simpler navigation: the Ad units tab now appears only once you add an Inventory API token, so the app opens straight to your revenue and reports. More reliable start-up on all devices.
 
 ## Screenshot captions (in order)
 1. Your revenue today — with yesterday, the week and the month for context
