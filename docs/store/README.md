@@ -34,6 +34,13 @@ few partners and reviewers cannot exercise the tab. It appears automatically
 for a user who already holds an inventory token, and for development builds
 with `--dart-define=ADPOCKET_AD_UNITS=true`.
 
+## iOS widget image
+
+`tools/widget/render.sh "23 Sep" "23 сент."` renders
+`screenshots/src/{en,ru}_ioswidget.png` from the real WidgetKit view
+(`ios/AdPocketWidget/Views.swift`) with the store figures. Use the date of
+the app captures so the widget and the screens agree.
+
 ## Promo video
 
 `video/` holds a 26-second promo built from the real UI: the overview cards fly
@@ -60,6 +67,9 @@ npm i puppeteer-core && pip3 install imageio-ffmpeg       # once
 node render.js --lang en --out ../../video/en_promo_1080x1920.mp4
 node render.js --lang en --w 886 --h 1920 --out ../../video/en_preview_886x1920.mp4
 ```
+
+Every export carries a silent stereo AAC track: App Store previews without
+audio fail processing silently.
 
 `promo.html` is the storyboard: every element is a pure function of time
 (`window.seek(t)`), so frames are deterministic. Open it in a browser with

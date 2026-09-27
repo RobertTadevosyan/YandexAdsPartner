@@ -48,8 +48,14 @@ function ffmpegPath() {
   }
   await browser.close();
   fs.mkdirSync(path.dirname(out), { recursive: true });
+  // App Store previews are rejected in processing (state FAILED, no message)
+  // without an audio track, so every export carries silent stereo AAC and
+  // follows Apple's spec: H.264 High, level 4.0, 30 fps, ~10 Mbps.
   execFileSync(ffmpegPath(), ['-y', '-framerate', String(fps), '-i', path.join(tmp, 'f%05d.png'),
-    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-crf', '17', '-preset', 'slow',
+    '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo', '-map', '0:v', '-map', '1:a', '-shortest',
+    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.0', '-r', String(fps),
+    '-b:v', '10M', '-maxrate', '12M', '-bufsize', '20M', '-preset', 'slow',
+    '-c:a', 'aac', '-b:a', '256k', '-ar', '44100', '-ac', '2',
     '-movflags', '+faststart', out], { stdio: 'inherit' });
   fs.rmSync(tmp, { recursive: true, force: true });
   console.log('wrote', out);
