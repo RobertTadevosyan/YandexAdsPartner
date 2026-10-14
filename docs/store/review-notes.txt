@@ -1,0 +1,13 @@
+AdPocket is a free, independent, third-party client for the Yandex Advertising Network Statistics API. It is not affiliated with Yandex.
+
+Accounts: the app has no accounts, registration, payments or server of its own. Signing in requires a read-only Statistics API OAuth token that publishers obtain free of charge at partner.yandex.ru (API > Get OAuth token for the Statistics API). For review, paste the token from the demo account's password field on the first screen; the username field is not used. The token belongs to a test partner account.
+
+Monetisation: none. No ads, no in-app purchases, no subscriptions, no paid content. Yandex pays publishers; publishers pay nothing.
+
+Permissions: notifications (optional daily/monthly summaries, asked only when the user turns them on in Settings); Face ID / Touch ID (optional app lock, asked only when the user turns it on).
+
+Widget: the home-screen widget shows the same data and needs no extra setup.
+
+What is different from other Yandex partner statistics apps: home-screen widgets on both iOS and Android that refresh themselves; several partner accounts side by side; a full report builder for all four Yandex report types (main, Mobile Mediation, SSP, DSP) with filters, groupings and CSV export; tokens kept only in the Keychain/Keystore, with no server in between.
+
+Changes in 1.2.2: Yandex currently refuses statistics requests longer than 8 days; the app now assembles the overview, the widgets and long reports from shorter requests and shows a note on screen while it does so. Sorting a report no longer reloads it.
