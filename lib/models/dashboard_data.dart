@@ -124,13 +124,28 @@ class DashboardData {
   final ReportResponse? topEntities;
   final String topPeriodValue;
 
+  /// Days (Moscow calendar) for which [series] is known to be complete: a
+  /// missing row inside this span means "no data that day", outside it means
+  /// "not fetched yet". Null in caches written before 1.2.2; see [coverage].
+  final DateTime? coveredFrom;
+  final DateTime? coveredTo;
+
   const DashboardData({
     required this.series,
     required this.currency,
     required this.fetchedAt,
     this.topEntities,
     this.topPeriodValue = 'thismonth',
+    this.coveredFrom,
+    this.coveredTo,
   });
+
+  /// Covered span; older caches always came from one 90-day request, so it is
+  /// the 90 days ending on the Moscow day they were fetched.
+  (DateTime, DateTime) get coverage {
+    final to = coveredTo ?? moscowToday(fetchedAt);
+    return (coveredFrom ?? addDays(to, -89), to);
+  }
 
   static DateTime _day(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -253,12 +268,18 @@ class DashboardData {
     fetchedAt: fetchedAt ?? this.fetchedAt,
     topEntities: topEntities ?? this.topEntities,
     topPeriodValue: topPeriodValue ?? this.topPeriodValue,
+    coveredFrom: coveredFrom,
+    coveredTo: coveredTo,
   );
 
   Map<String, dynamic> toJson() => {
     'currency': currency,
     'fetchedAt': fetchedAt.toIso8601String(),
     'topPeriodValue': topPeriodValue,
+    if (coveredFrom != null)
+      'coveredFrom': coveredFrom!.toIso8601String().substring(0, 10),
+    if (coveredTo != null)
+      'coveredTo': coveredTo!.toIso8601String().substring(0, 10),
     'series':
         series
             .map(
@@ -280,6 +301,8 @@ class DashboardData {
     fetchedAt:
         DateTime.tryParse(json['fetchedAt'] as String? ?? '') ?? DateTime.now(),
     topPeriodValue: json['topPeriodValue'] as String? ?? 'thismonth',
+    coveredFrom: DateTime.tryParse(json['coveredFrom'] as String? ?? ''),
+    coveredTo: DateTime.tryParse(json['coveredTo'] as String? ?? ''),
     series:
         (json['series'] as List? ?? [])
             .whereType<Map>()

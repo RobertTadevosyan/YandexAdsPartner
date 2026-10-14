@@ -56,6 +56,58 @@ class ReportPeriod {
     ];
   }
 
+  /// The calendar days the API covers for this period, relative to the
+  /// Moscow day [today]. Relative presets match what the API returned while
+  /// it still accepted them (Oct 2026): "7days" and "30days" include today
+  /// plus 7 / 30 earlier days, "90days" is 90 days ending today.
+  DateTimeRange resolve(DateTime today) {
+    DateTime day(int offset) =>
+        DateTime(today.year, today.month, today.day + offset);
+    DateTimeRange span(DateTime a, DateTime b) =>
+        DateTimeRange(start: a, end: b);
+    if (isCustom) {
+      final r = range!;
+      return span(
+        DateTime(r.start.year, r.start.month, r.start.day),
+        DateTime(r.end.year, r.end.month, r.end.day),
+      );
+    }
+    switch (preset) {
+      case PeriodPreset.today:
+      case PeriodPreset.custom:
+        return span(day(0), day(0));
+      case PeriodPreset.yesterday:
+        return span(day(-1), day(-1));
+      case PeriodPreset.thisWeek:
+        return span(day(-(today.weekday - 1)), day(0));
+      case PeriodPreset.days7:
+        return span(day(-7), day(0));
+      case PeriodPreset.thisMonth:
+        return span(DateTime(today.year, today.month, 1), day(0));
+      case PeriodPreset.lastMonth:
+        return span(
+          DateTime(today.year, today.month - 1, 1),
+          DateTime(today.year, today.month, 0),
+        );
+      case PeriodPreset.days30:
+        return span(day(-30), day(0));
+      case PeriodPreset.days90:
+        return span(day(-89), day(0));
+      case PeriodPreset.days180:
+        return span(day(-179), day(0));
+      case PeriodPreset.days365:
+        return span(day(-364), day(0));
+      case PeriodPreset.thisYear:
+        return span(DateTime(today.year, 1, 1), day(0));
+    }
+  }
+
+  /// Number of calendar days in [resolve].
+  int spanDays(DateTime today) {
+    final r = resolve(today);
+    return r.end.difference(r.start).inDays + 1;
+  }
+
   String label(String lang) {
     if (isCustom) return Fmt.range(range!.start, range!.end, lang);
     return preset.label(lang);

@@ -4,7 +4,7 @@ import 'package:adpocket/core/formatters.dart';
 import 'package:adpocket/core/settings.dart';
 import 'package:adpocket/core/strings.dart';
 import 'package:adpocket/models/dashboard_data.dart';
-import 'package:adpocket/models/report_response.dart';
+import 'package:adpocket/services/dashboard_loader.dart';
 import 'package:adpocket/services/api_exception.dart';
 import 'package:adpocket/services/demo_client.dart';
 import 'package:adpocket/services/notification_service.dart';
@@ -153,13 +153,16 @@ class WidgetService {
     // Demo builds must not send fake tokens to the real API from the
     // background isolate either.
     final api = YandexApiService(client: kDemoMode ? demoClient() : null);
-    final ReportResponse daily;
+    final accountId = await TokenStorage.getActiveAccountId();
+    final cached = await ReportCache.loadDashboard(accountId: accountId);
+    final DailySeries daily;
     try {
-      daily = await api.fetchDailySeries(
+      daily = await DashboardLoader(api).loadDaily(
         token: token,
         lang: settings.lang,
         currency: settings.currency,
         vat: settings.vat,
+        cached: cached,
       );
     } on ApiException catch (e) {
       if (e.isUnauthorized) {
@@ -174,17 +177,14 @@ class WidgetService {
       await _flag(e.isNetwork ? s['widget.offline'] : s['widget.error']);
       rethrow;
     }
-    final series =
-        daily.points.map(DailyPoint.fromPoint).whereType<DailyPoint>().toList()
-          ..sort((a, b) => a.date.compareTo(b.date));
-    final accountId = await TokenStorage.getActiveAccountId();
-    final cached = await ReportCache.loadDashboard(accountId: accountId);
     final data = DashboardData(
-      series: series,
+      series: daily.points,
       currency: daily.currency ?? settings.currency,
       fetchedAt: DateTime.now(),
       topEntities: cached?.topEntities,
       topPeriodValue: cached?.topPeriodValue ?? 'thismonth',
+      coveredFrom: daily.coveredFrom,
+      coveredTo: daily.coveredTo,
     );
     await ReportCache.saveDashboard(data, accountId: accountId);
     await push(

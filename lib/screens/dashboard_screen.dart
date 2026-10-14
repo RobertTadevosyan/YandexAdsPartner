@@ -8,12 +8,15 @@ import 'package:adpocket/core/settings.dart';
 import 'package:adpocket/models/dashboard_data.dart';
 import 'package:adpocket/models/filter_field.dart';
 import 'package:adpocket/models/report_preset.dart';
+import 'package:adpocket/models/report_response.dart';
+import 'package:adpocket/services/dashboard_loader.dart';
 import 'package:adpocket/services/api_exception.dart';
 import 'package:adpocket/services/notification_service.dart';
 import 'package:adpocket/services/report_cache.dart';
 import 'package:adpocket/services/widget_service.dart';
 import 'package:adpocket/theme.dart';
 import 'package:adpocket/widgets/account_switcher.dart';
+import 'package:adpocket/widgets/fallback_notice.dart';
 import 'package:adpocket/widgets/kpi_card.dart';
 import 'package:adpocket/widgets/revenue_chart.dart';
 import 'package:adpocket/widgets/section_card.dart';
@@ -48,6 +51,12 @@ class _DashboardScreenState extends State<DashboardScreen>
   DashWindow _detailWindow = DashWindow.days7;
   PeriodPreset _topPeriod = PeriodPreset.thisMonth;
   String? _fetchKey;
+  int _fetchSeq = 0;
+
+  /// True when the last refresh had to assemble the series from short
+  /// requests; progress while it does so.
+  bool _assembled = false;
+  (int, int)? _progress;
   String? _accountId;
 
   static const _topPresets = [
@@ -131,40 +140,54 @@ class _DashboardScreenState extends State<DashboardScreen>
     final token = session.token;
     final accountId = session.accountId;
     if (token == null) return;
+    final seq = ++_fetchSeq;
     setState(() {
       _loading = true;
       _error = null;
     });
     // Results for an account the user has since switched away from must not
-    // be shown, cached or pushed under the new account.
-    bool stale() => !mounted || session.accountId != accountId;
+    // be shown, cached or pushed under the new account; nor may a refresh that
+    // a newer one has overtaken (pull-to-refresh while one is running).
+    bool stale() =>
+        !mounted || session.accountId != accountId || seq != _fetchSeq;
+    final loader = DashboardLoader(session.api, clock: widget.clock);
+    final topPeriod = _topPeriod;
     try {
-      final daily = await session.api.fetchDailySeries(
+      final daily = await loader.loadDaily(
         token: token,
         lang: settings.lang,
         currency: settings.currency,
         vat: settings.vat,
-      );
-      final top = await session.api.fetchTopEntities(
-        token: token,
-        period: ReportPeriod.preset(_topPeriod),
-        lang: settings.lang,
-        currency: settings.currency,
-        vat: settings.vat,
+        cached: _data,
+        onProgress: (done, total) {
+          if (!stale()) setState(() => _progress = (done, total));
+        },
       );
       if (stale()) return;
-      final series =
-          daily.points
-              .map(DailyPoint.fromPoint)
-              .whereType<DailyPoint>()
-              .toList()
-            ..sort((a, b) => a.date.compareTo(b.date));
+      // Apps and sites is secondary: if it fails, keep the previous list and
+      // still show fresh revenue.
+      ReportResponse? top =
+          _data?.topPeriodValue == topPeriod.value ? _data?.topEntities : null;
+      try {
+        top = await loader.loadTop(
+          token: token,
+          preset: topPeriod,
+          lang: settings.lang,
+          currency: settings.currency,
+          vat: settings.vat,
+        );
+      } on ApiException catch (e) {
+        if (e.isUnauthorized) rethrow;
+      }
+      if (stale()) return;
       final data = DashboardData(
-        series: series,
+        series: daily.points,
         currency: daily.currency ?? settings.currency,
         fetchedAt: widget.clock(),
         topEntities: top,
-        topPeriodValue: _topPeriod.value,
+        topPeriodValue: topPeriod.value,
+        coveredFrom: daily.coveredFrom,
+        coveredTo: daily.coveredTo,
       );
       await ReportCache.saveDashboard(data, accountId: accountId);
       WidgetService.push(
@@ -175,7 +198,10 @@ class _DashboardScreenState extends State<DashboardScreen>
       );
       NotificationService.onDataRefreshed(data, settings);
       if (stale()) return;
-      setState(() => _data = data);
+      setState(() {
+        _data = data;
+        _assembled = daily.assembled;
+      });
     } on ApiException catch (e) {
       if (stale()) return;
       setState(
@@ -191,7 +217,12 @@ class _DashboardScreenState extends State<DashboardScreen>
       if (stale()) return;
       setState(() => _error = e.toString());
     } finally {
-      if (mounted && !stale()) setState(() => _loading = false);
+      if (mounted && !stale()) {
+        setState(() {
+          _loading = false;
+          _progress = null;
+        });
+      }
     }
   }
 
@@ -206,9 +237,12 @@ class _DashboardScreenState extends State<DashboardScreen>
       _loadingTop = true;
     });
     try {
-      final top = await session.api.fetchTopEntities(
+      final top = await DashboardLoader(
+        session.api,
+        clock: widget.clock,
+      ).loadTop(
         token: token,
-        period: ReportPeriod.preset(preset),
+        preset: preset,
         lang: settings.lang,
         currency: settings.currency,
         vat: settings.vat,
@@ -392,6 +426,10 @@ class _DashboardScreenState extends State<DashboardScreen>
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
       children: [
+        if (_progress != null)
+          FallbackNotice(progress: _progress)
+        else if (_assembled)
+          const FallbackNotice(),
         if (_error != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
