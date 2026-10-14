@@ -99,6 +99,12 @@ class AppStrings {
     'rep.retry': 'Повторить',
     'rep.customRange': 'Произвольный период',
     'rep.sortHint': 'Нажмите на заголовок показателя, чтобы отсортировать',
+    'fallback.title': 'Собрано из коротких запросов',
+    'fallback.notice':
+        'Яндекс сейчас отклоняет запросы статистики длиннее %d дней, поэтому AdPocket собирает данные из нескольких коротких запросов. Это дольше обычного.',
+    'fallback.requests': 'Запросов: %d',
+    'fallback.progress': 'Собираем из коротких запросов: %d из %d',
+    'fallback.unavailable': 'Недоступно при сборке из нескольких периодов: %s',
     'rep.addFilter': 'Добавить фильтр',
     'rep.filterField': 'Поле',
     'rep.filterOp': 'Условие',
@@ -380,6 +386,13 @@ class AppStrings {
     'rep.retry': 'Retry',
     'rep.customRange': 'Custom range',
     'rep.sortHint': 'Tap a metric header to sort',
+    'fallback.title': 'Assembled from shorter requests',
+    'fallback.notice':
+        'Yandex is currently rejecting statistics requests longer than %d days, so AdPocket assembles the data from several shorter requests. This takes longer than usual.',
+    'fallback.requests': 'Requests: %d',
+    'fallback.progress': 'Assembling from shorter requests: %d of %d',
+    'fallback.unavailable':
+        'Not available when several periods are combined: %s',
     'rep.addFilter': 'Add filter',
     'rep.filterField': 'Field',
     'rep.filterOp': 'Condition',

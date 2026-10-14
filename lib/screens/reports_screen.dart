@@ -10,6 +10,10 @@ import 'package:adpocket/core/session.dart';
 import 'package:adpocket/core/settings.dart';
 import 'package:adpocket/core/strings.dart';
 import 'package:adpocket/models/filter_field.dart';
+import 'package:adpocket/widgets/fallback_notice.dart';
+import 'package:adpocket/services/report_assembler.dart';
+import 'package:adpocket/services/long_period_guard.dart';
+import 'package:adpocket/models/dashboard_data.dart';
 import 'package:adpocket/models/report_preset.dart';
 import 'package:adpocket/models/report_response.dart';
 import 'package:adpocket/models/stat_type.dart';
@@ -52,6 +56,14 @@ class ReportsScreenState extends State<ReportsScreen> {
   ReportResponse? _report;
   bool _loading = false;
   bool _loadingMore = false;
+  bool _resorting = false;
+
+  /// When Yandex refused the long period: every row of the assembled report
+  /// (the table shows a page of it), how it was built, and progress while
+  /// assembling.
+  ReportResponse? _full;
+  AssembledReport? _assembled;
+  (int, int)? _progress;
   String? _error;
   bool _chartMode = false;
   String? _chartMetric;
@@ -77,6 +89,8 @@ class ReportsScreenState extends State<ReportsScreen> {
       setState(() {
         _catalog = null;
         _report = null;
+        _full = null;
+        _assembled = null;
         _error = null;
         _orderBy = null;
         _metricIds = [];
@@ -193,6 +207,8 @@ class ReportsScreenState extends State<ReportsScreen> {
       _statType = type;
       _catalog = null;
       _report = null;
+      _full = null;
+      _assembled = null;
       _error = null;
       _orderBy = null;
       _metricIds = [];
@@ -224,6 +240,8 @@ class ReportsScreenState extends State<ReportsScreen> {
       if (typeChanged) {
         _catalog = null;
         _report = null;
+        _full = null;
+        _assembled = null;
       }
     });
     if (typeChanged) {
@@ -243,7 +261,17 @@ class ReportsScreenState extends State<ReportsScreen> {
       if (e.value == null) e.key,
   ];
 
-  Future<void> _run({bool append = false}) async {
+  ReportResponse _page(ReportResponse full, int count) {
+    final n = count.clamp(0, full.points.length);
+    return full.copyWith(
+      points: full.points.take(n).toList(),
+      isLastPage: n >= full.points.length,
+    );
+  }
+
+  /// [resort] re-asks the server for a new order while the current rows stay
+  /// on screen, so the page keeps its scroll position.
+  Future<void> _run({bool append = false, bool resort = false}) async {
     final settings = context.read<AppSettings>();
     final session = context.read<AppSession>();
     final s = settings.strings;
@@ -254,29 +282,41 @@ class ReportsScreenState extends State<ReportsScreen> {
       setState(() => _error = s['rep.needSelection']);
       return;
     }
+    if (append && _full != null) {
+      setState(
+        () => _report = _page(_full!, _report!.points.length + _pageSize),
+      );
+      return;
+    }
     if (append) {
       setState(() => _loadingMore = true);
+    } else if (resort) {
+      setState(() => _resorting = true);
     } else {
       setState(() {
         _loading = true;
         _error = null;
+        _full = null;
+        _assembled = null;
+        _progress = null;
       });
       _persist();
     }
     try {
       final offset = append ? (_report?.points.length ?? 0) : 0;
-      final response = await session.api.fetchReport(
+      final order =
+          _orderBy ??
+          (_dimensionFields.containsKey('date')
+              ? const OrderBy('date', desc: true)
+              : null);
+      Future<ReportResponse> normal() => session.api.fetchReport(
         token: token,
         period: _period,
         fields: _metricIds,
         dimensionFields: _dimensionFields,
         entityFields: _entityFields,
         filters: _filters,
-        orderBy:
-            _orderBy ??
-            (_dimensionFields.containsKey('date')
-                ? const OrderBy('date', desc: true)
-                : null),
+        orderBy: order,
         limit: _pageSize,
         offset: offset,
         lang: settings.lang,
@@ -284,11 +324,55 @@ class ReportsScreenState extends State<ReportsScreen> {
         vat: settings.vat,
         statType: _statType.value,
       );
+      Future<AssembledReport> assemble() => ReportAssembler(session.api).load(
+        token: token,
+        range: _period.resolve(DashboardData.moscowToday()),
+        fields: _metricIds,
+        dimensionFields: _dimensionFields,
+        entityFields: _entityFields,
+        filters: _filters,
+        orderBy: order,
+        lang: settings.lang,
+        currency: settings.currency,
+        vat: settings.vat,
+        statType: _statType.value,
+        onProgress: (done, total) {
+          if (mounted) setState(() => _progress = (done, total));
+        },
+      );
+
+      // Only a fresh run of a long period can need the fallback; paging and
+      // re-sorting a normal result stay normal.
+      final long =
+          !append &&
+          !resort &&
+          _period.spanDays(DashboardData.moscowToday()) >
+              LongPeriodGuard.maxSpanDays;
+      final guard = LongPeriodGuard();
+      ReportResponse? response;
+      AssembledReport? assembled;
+      if (long && await guard.recentlyRejected()) {
+        assembled = await assemble();
+      } else {
+        try {
+          response = await normal();
+          if (long) await guard.markAccepted();
+        } on ApiException catch (e) {
+          if (!long || !LongPeriodGuard.shouldFallBack(e)) rethrow;
+          await guard.note(e);
+          assembled = await assemble();
+        }
+      }
       if (!mounted || session.accountId != accountId) return;
       setState(() {
-        if (append && _report != null) {
+        _progress = null;
+        if (assembled != null) {
+          _full = assembled.report;
+          _assembled = assembled;
+          _report = _page(assembled.report, _pageSize);
+        } else if (append && _report != null) {
           _report = _report!.copyWith(
-            points: [..._report!.points, ...response.points],
+            points: [..._report!.points, ...response!.points],
             isLastPage: response.isLastPage,
           );
         } else {
@@ -304,8 +388,8 @@ class ReportsScreenState extends State<ReportsScreen> {
           e.isUnauthorized
               ? s['common.unauthorized']
               : (e.isNetwork ? s['common.noInternet'] : e.message);
-      if (append) {
-        // Keep the rows already on screen; just tell the user the next page failed.
+      if (append || resort) {
+        // Keep the rows already on screen; just tell the user the request failed.
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(message)));
@@ -314,7 +398,7 @@ class ReportsScreenState extends State<ReportsScreen> {
       }
     } catch (e) {
       if (!mounted || session.accountId != accountId) return;
-      if (append) {
+      if (append || resort) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(e.toString())));
@@ -326,6 +410,7 @@ class ReportsScreenState extends State<ReportsScreen> {
         setState(() {
           _loading = false;
           _loadingMore = false;
+          _resorting = false;
         });
       }
     }
@@ -576,7 +661,12 @@ class ReportsScreenState extends State<ReportsScreen> {
                       : _buildConfig(catalog, s, scheme),
             ),
             const SizedBox(height: 16),
-            if (_loading)
+            if (_loading && _progress != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: FallbackNotice(progress: _progress),
+              )
+            else if (_loading)
               LoadingView(text: s['rep.results'])
             else if (_error != null)
               ErrorView(
@@ -756,6 +846,14 @@ class ReportsScreenState extends State<ReportsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (_assembled != null)
+            FallbackNotice(
+              requests: _assembled!.requests,
+              unavailable: [
+                for (final id in _assembled!.unavailable)
+                  catalog.byId(id)?.title ?? id,
+              ],
+            ),
           Row(
             children: [
               Expanded(
@@ -865,7 +963,7 @@ class ReportsScreenState extends State<ReportsScreen> {
                         text: s['rep.tooManyForChart'],
                         icon: Icons.show_chart,
                       )
-                      : _buildChart(report, s, lang),
+                      : _buildChart(_full ?? report, s, lang),
             )
           else
             SectionCard(
@@ -877,10 +975,44 @@ class ReportsScreenState extends State<ReportsScreen> {
                 sortField: _orderBy?.field,
                 sortDesc: _orderBy?.desc ?? true,
                 onSort: (field, desc) {
-                  setState(() => _orderBy = OrderBy(field, desc: desc));
-                  _run();
+                  final order = OrderBy(field, desc: desc);
+                  if (_full != null) {
+                    // Assembled report: every row is on the device.
+                    setState(() {
+                      _orderBy = order;
+                      _full = _full!.copyWith(
+                        points: sortReportPoints(
+                          _full!.points,
+                          order.field,
+                          desc: order.desc,
+                        ),
+                      );
+                      _report = _page(_full!, report.points.length);
+                    });
+                  } else if (report.isLastPage ||
+                      report.points.length >= report.totalRows) {
+                    // Every row is already here: sort on the device.
+                    setState(() {
+                      _orderBy = order;
+                      _report = report.copyWith(
+                        points: sortReportPoints(
+                          report.points,
+                          order.field,
+                          desc: order.desc,
+                        ),
+                      );
+                    });
+                  } else {
+                    setState(() => _orderBy = order);
+                    _run(resort: true);
+                  }
                 },
               ),
+            ),
+          if (_resorting)
+            const Padding(
+              padding: EdgeInsets.only(top: 4),
+              child: LinearProgressIndicator(minHeight: 2),
             ),
           const SizedBox(height: 10),
           Row(

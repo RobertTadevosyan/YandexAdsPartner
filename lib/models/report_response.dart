@@ -204,3 +204,29 @@ class ReportResponse {
         dimensions: dimensions,
       );
 }
+
+/// Rows ordered the way the API orders them: by a measure numerically
+/// (missing counts as zero) or by a dimension as text (ISO dates sort
+/// correctly). Ties keep their current order; the input is not modified.
+List<ReportPoint> sortReportPoints(
+  List<ReportPoint> points,
+  String field, {
+  required bool desc,
+}) {
+  final byMeasure = points.any((p) => p.measures.containsKey(field));
+  final indexed =
+      points.indexed.toList()..sort((a, b) {
+        final int c;
+        if (byMeasure) {
+          final va = a.$2.measures[field] ?? 0;
+          final vb = b.$2.measures[field] ?? 0;
+          c = desc ? vb.compareTo(va) : va.compareTo(vb);
+        } else {
+          final va = a.$2.dimensions[field] ?? '';
+          final vb = b.$2.dimensions[field] ?? '';
+          c = desc ? vb.compareTo(va) : va.compareTo(vb);
+        }
+        return c != 0 ? c : a.$1.compareTo(b.$1);
+      });
+  return [for (final e in indexed) e.$2];
+}

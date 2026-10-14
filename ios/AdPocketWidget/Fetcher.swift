@@ -23,7 +23,7 @@ enum YandexFetcher {
         return value
     }
 
-    /// One request: the last 30 days by day. Enough for today, yesterday and
+    /// One request: today and the 7 days before it, by day. Enough for today, yesterday and
     /// a 7-day sparkline.
     static func fetch(lang: String, currency: String, vat: Bool) async throws -> WidgetSnapshot {
         guard let token = token() else { throw FetchError.noToken }
@@ -33,7 +33,7 @@ enum YandexFetcher {
             .init(name: "stat_type", value: "main"),
             .init(name: "currency", value: currency),
             .init(name: "vat", value: vat ? "true" : "false"),
-            .init(name: "period", value: "30days"),
+            .init(name: "period", value: "7days"), // today + 7 days: within the API's 8-day limit (Oct 2026)
             .init(name: "field", value: "partner_wo_nds"),
             .init(name: "field", value: "shows"),
             .init(name: "field", value: "clicks"),
