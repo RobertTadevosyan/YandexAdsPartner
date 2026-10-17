@@ -10,4 +10,4 @@ Widget: the home-screen widget shows the same data and needs no extra setup.
 
 What is different from other Yandex partner statistics apps: home-screen widgets on both iOS and Android that refresh themselves; several partner accounts side by side; a full report builder for all four Yandex report types (main, Mobile Mediation, SSP, DSP) with filters, groupings and CSV export; tokens kept only in the Keychain/Keystore, with no server in between.
 
-Changes in 1.2.2: Yandex currently refuses statistics requests longer than 8 days; the app now assembles the overview, the widgets and long reports from shorter requests and shows a note on screen while it does so. Sorting a report no longer reloads it.
+Changes in 1.2.3: App lock (Settings, off by default) gets a "Lock after" delay (immediately, 1, 3, 5, 10 or 15 minutes in the background), and the Unlock button works again after the system Face ID / passcode prompt is cancelled or fails.
