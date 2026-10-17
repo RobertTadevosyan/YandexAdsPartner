@@ -38,7 +38,15 @@
 				<string>adpocket</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.491619463560-vpoveeilgn9euivm5epfl954rvlgb93f</string>
+			</array>
+		</dict>
 	</array>
+	<key>GIDClientID</key>
+	<string>491619463560-vpoveeilgn9euivm5epfl954rvlgb93f.apps.googleusercontent.com</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Unlock AdPocket with Face ID when app lock is enabled.</string>
 	<key>UIApplicationSceneManifest</key>

@@ -9,7 +9,11 @@ class FilterFieldValue {
 class FilterField {
   final String id;
   final String label;
-  final String type; // text | tree | boolean | publicid
+
+  /// AdMob dimension filters: pick one or more of [values] (= / IN only).
+  static const kTypeChoice = 'choice';
+
+  final String type; // text | tree | boolean | publicid | choice
   final String categoryName;
   final int index;
   final List<FilterFieldValue> values;
@@ -26,6 +30,7 @@ class FilterField {
   bool get hasValues => values.isNotEmpty;
   bool get isBoolean => type == 'boolean';
   bool get isText => type == 'text';
+  bool get isChoice => type == kTypeChoice;
 }
 
 /// Operators supported by the Statistics API `filter` parameter.
@@ -49,6 +54,7 @@ enum FilterOp {
 
   static List<FilterOp> forField(FilterField field) {
     if (field.isBoolean) return const [FilterOp.eq];
+    if (field.isChoice) return const [FilterOp.eq, FilterOp.inList];
     if (field.hasValues) {
       return const [FilterOp.eq, FilterOp.ne, FilterOp.inList];
     }

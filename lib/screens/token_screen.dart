@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:adpocket/core/layout.dart';
 import 'package:adpocket/core/session.dart';
 import 'package:adpocket/core/settings.dart';
+import 'package:adpocket/screens/admob_connect_screen.dart';
 import 'package:adpocket/services/api_exception.dart';
 import 'package:adpocket/services/widget_service.dart';
 import 'package:adpocket/theme.dart';
@@ -90,6 +91,15 @@ class _TokenScreenState extends State<TokenScreen> {
       setState(() => _error = '${s['common.error']}: $e');
     } finally {
       if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _connectAdMob() async {
+    final added = await Navigator.of(
+      context,
+    ).push<bool>(MaterialPageRoute(builder: (_) => const AdMobConnectScreen()));
+    if (added == true && mounted && widget.popsOnSuccess) {
+      Navigator.of(context).pop(true);
     }
   }
 
@@ -209,6 +219,15 @@ class _TokenScreenState extends State<TokenScreen> {
                         )
                         : Text(s['token.continue']),
               ),
+              if (!widget.replaceMode &&
+                  context.read<AppSession>().admob.auth.configured) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: _busy ? null : _connectAdMob,
+                  icon: const Icon(Icons.add_chart, color: Color(0xFF1A73E8)),
+                  label: Text(s['admob.connect']),
+                ),
+              ],
               const SizedBox(height: 24),
               SectionCard(
                 title: s['token.howto'],

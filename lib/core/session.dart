@@ -1,5 +1,8 @@
 import 'package:adpocket/models/account.dart';
+import 'package:adpocket/models/filter_field.dart';
+import 'package:adpocket/models/stat_type.dart';
 import 'package:adpocket/models/tree_catalog.dart';
+import 'package:adpocket/services/admob_api_service.dart';
 import 'package:adpocket/services/inventory_api_service.dart';
 import 'package:adpocket/services/report_cache.dart';
 import 'package:adpocket/services/token_storage.dart';
@@ -11,6 +14,7 @@ import 'package:flutter/foundation.dart';
 class AppSession extends ChangeNotifier {
   final YandexApiService api;
   final InventoryApiService inventory;
+  final AdMobApiService admob;
 
   List<Account> _accounts;
   String? _activeId;
@@ -26,6 +30,7 @@ class AppSession extends ChangeNotifier {
   AppSession({
     YandexApiService? api,
     InventoryApiService? inventory,
+    AdMobApiService? admob,
     String? token,
     String? inventoryToken,
     List<Account>? accounts,
@@ -33,6 +38,7 @@ class AppSession extends ChangeNotifier {
     String Function(int index)? defaultLabel,
   }) : api = api ?? YandexApiService(),
        inventory = inventory ?? InventoryApiService(),
+       admob = admob ?? AdMobApiService(),
        defaultLabel = defaultLabel ?? ((i) => 'Account $i'),
        _accounts =
            accounts ??
@@ -75,6 +81,7 @@ class AppSession extends ChangeNotifier {
   static Future<AppSession> restore({
     YandexApiService? api,
     InventoryApiService? inventory,
+    AdMobApiService? admob,
     String Function(int index)? defaultLabel,
   }) async {
     final label = defaultLabel ?? ((i) => 'Account $i');
@@ -87,6 +94,7 @@ class AppSession extends ChangeNotifier {
     final session = AppSession(
       api: api,
       inventory: inventory,
+      admob: admob,
       inventoryToken: inv,
       accounts: accounts,
       activeId: activeId,
@@ -111,6 +119,51 @@ class AppSession extends ChangeNotifier {
             ? defaultLabel(_accounts.length + 1)
             : label.trim();
     final account = Account.create(token: token, label: name);
+    _accounts = [..._accounts, account];
+    _activeId = account.id;
+    _resetCatalog();
+    await TokenStorage.saveAccounts(_accounts);
+    await TokenStorage.setActiveAccountId(_activeId);
+    await _mirrorActiveToken();
+    notifyListeners();
+    return account;
+  }
+
+  /// Adds an AdMob publisher account reached through [googleEmail] (or
+  /// re-activates it if already added) and makes it active.
+  Future<Account> addAdMobAccount({
+    required String publisherId,
+    required String googleEmail,
+    String? label,
+  }) async {
+    final existing = _accounts.where(
+      (a) => a.isAdMob && a.publisherId == publisherId,
+    );
+    if (existing.isNotEmpty) {
+      final a = existing.first;
+      if (a.googleEmail != googleEmail) {
+        _accounts = [
+          for (final x in _accounts)
+            x.id == a.id ? x.copyWith(googleEmail: googleEmail) : x,
+        ];
+        await TokenStorage.saveAccounts(_accounts);
+      }
+      if (a.id == _activeId) {
+        notifyListeners();
+      } else {
+        await switchAccount(a.id);
+      }
+      return active!;
+    }
+    final name =
+        (label == null || label.trim().isEmpty)
+            ? defaultLabel(_accounts.length + 1)
+            : label.trim();
+    final account = Account.admob(
+      publisherId: publisherId,
+      googleEmail: googleEmail,
+      label: name,
+    );
     _accounts = [..._accounts, account];
     _activeId = account.id;
     _resetCatalog();
@@ -158,8 +211,21 @@ class AppSession extends ChangeNotifier {
   /// Removes an account and its cached data. If it was active, the first
   /// remaining account becomes active; with none left the app is signed out.
   Future<void> removeAccount(String id) async {
-    if (!_accounts.any((a) => a.id == id)) return;
+    final removed = _accounts.where((a) => a.id == id).firstOrNull;
+    if (removed == null) return;
     _accounts = _accounts.where((a) => a.id != id).toList();
+    // The last AdMob account of a Google user: revoke AdPocket's access too.
+    // Not awaited: Google's sign-out can stay pending after the revoke has
+    // gone through, and removing the account must not wait for it.
+    if (removed.isAdMob &&
+        !_accounts.any(
+          (a) => a.isAdMob && a.googleEmail == removed.googleEmail,
+        )) {
+      admob.auth
+          .disconnect()
+          .timeout(const Duration(seconds: 20))
+          .catchError((Object _) {});
+    }
     await ReportCache.clearAccount(id);
     if (_activeId == id) {
       _activeId = _accounts.isEmpty ? null : _accounts.first.id;
@@ -220,8 +286,23 @@ class AppSession extends ChangeNotifier {
     if (!refresh && _catalogFutures[key] != null) return _catalogFutures[key]!;
     final t = token ?? '';
     final generation = _catalogGeneration;
-    final future = api
-        .fetchCatalog(t, lang: lang, statType: statType)
+    final account = active;
+    final type = StatType.fromValue(statType);
+    final Future<TreeCatalog> source;
+    if (account != null && account.isAdMob) {
+      // Built in; only the app list (for the App filter) comes from AdMob.
+      final kind =
+          type == StatType.admobMediation
+              ? AdMobReportKind.mediation
+              : AdMobReportKind.network;
+      source = admob
+          .listApps(account)
+          .catchError((Object _) => <FilterFieldValue>[])
+          .then((apps) => AdMobSchema.catalog(kind, lang, apps: apps));
+    } else {
+      source = api.fetchCatalog(t, lang: lang, statType: statType);
+    }
+    final future = source
         .then((c) {
           if (generation == _catalogGeneration) _catalogs[key] = c;
           return c;

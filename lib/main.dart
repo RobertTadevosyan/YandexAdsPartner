@@ -61,13 +61,20 @@ class AdPocketApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: settings),
         ChangeNotifierProvider.value(value: session),
       ],
-      child: Consumer<AppSettings>(
+      child: Consumer2<AppSettings, AppSession>(
         builder:
-            (context, settings, _) => MaterialApp(
+            (context, settings, session, _) => MaterialApp(
               title: 'AdPocket',
               debugShowCheckedModeBanner: false,
-              theme: adPocketLightTheme,
-              darkTheme: adPocketDarkTheme,
+              // AdMob accounts wear Google colours; Yandex keeps the original.
+              theme:
+                  session.active?.isAdMob == true
+                      ? adMobLightTheme
+                      : adPocketLightTheme,
+              darkTheme:
+                  session.active?.isAdMob == true
+                      ? adMobDarkTheme
+                      : adPocketDarkTheme,
               themeMode: settings.themeMode,
               locale: settings.locale,
               supportedLocales: const [Locale('ru'), Locale('en')],

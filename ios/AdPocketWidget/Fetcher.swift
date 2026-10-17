@@ -5,7 +5,7 @@ import Security
 /// widget stays fresh even when the app has not been opened for a while.
 /// The token is read from the keychain access group shared with the app.
 enum YandexFetcher {
-    enum FetchError: Error { case noToken, unauthorized, http(Int), network, parse }
+    enum FetchError: Error { case noToken, unauthorized, http(Int), network, parse, appOnly }
 
     static func token() -> String? {
         let query: [CFString: Any] = [
@@ -27,6 +27,8 @@ enum YandexFetcher {
     /// a 7-day sparkline.
     static func fetch(lang: String, currency: String, vat: Bool) async throws -> WidgetSnapshot {
         guard let token = token() else { throw FetchError.noToken }
+        // AdMob accounts: Google's grant lives in the app, which pushes snapshots.
+        if token.hasPrefix("admob:") { throw FetchError.appOnly }
         var comps = URLComponents(string: "https://partner2.yandex.ru/api/statistics2/get.json")!
         comps.queryItems = [
             .init(name: "lang", value: lang),
@@ -130,6 +132,8 @@ enum YandexFetcher {
             let out = WidgetSnapshot.signedOut(lang: lang)
             WidgetStore.save(out)
             return out
+        } catch FetchError.appOnly {
+            return nil
         } catch FetchError.network {
             WidgetStore.flag(L10n.offline(lang))
             return nil

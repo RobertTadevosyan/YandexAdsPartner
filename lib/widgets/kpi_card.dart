@@ -25,14 +25,15 @@ class KpiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final brand = BrandPalette.of(context);
     final deltaColor =
         deltaPositive == null
             ? scheme.onSurfaceVariant
-            : (deltaPositive! ? Brand.positive : Brand.negative);
+            : (deltaPositive! ? brand.positive : brand.negative);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: emphasized ? Brand.amber : scheme.surface,
+        color: emphasized ? brand.heroStart : scheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -45,7 +46,7 @@ class KpiCard extends StatelessWidget {
                 Icon(
                   icon,
                   size: 16,
-                  color: emphasized ? Brand.navy : scheme.onSurfaceVariant,
+                  color: emphasized ? brand.onHero : scheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 6),
               ],
@@ -59,7 +60,7 @@ class KpiCard extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     color:
                         emphasized
-                            ? Brand.navy.withValues(alpha: 0.8)
+                            ? brand.onHero.withValues(alpha: 0.8)
                             : scheme.onSurfaceVariant,
                   ),
                 ),
@@ -75,7 +76,7 @@ class KpiCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: emphasized ? 26 : 20,
                 fontWeight: FontWeight.w800,
-                color: emphasized ? Brand.navy : scheme.onSurface,
+                color: emphasized ? brand.onHero : scheme.onSurface,
                 letterSpacing: -0.5,
               ),
             ),
@@ -92,7 +93,7 @@ class KpiCard extends StatelessWidget {
                             ? Icons.arrow_upward
                             : Icons.arrow_downward),
                     size: 13,
-                    color: emphasized ? Brand.navy : deltaColor,
+                    color: emphasized ? brand.onHero : deltaColor,
                   ),
                   const SizedBox(width: 2),
                   Text(
@@ -100,7 +101,7 @@ class KpiCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: emphasized ? Brand.navy : deltaColor,
+                      color: emphasized ? brand.onHero : deltaColor,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -115,7 +116,7 @@ class KpiCard extends StatelessWidget {
                         fontSize: 11,
                         color:
                             emphasized
-                                ? Brand.navy.withValues(alpha: 0.7)
+                                ? brand.onHero.withValues(alpha: 0.7)
                                 : scheme.onSurfaceVariant,
                       ),
                     ),

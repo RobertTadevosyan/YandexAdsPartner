@@ -161,6 +161,27 @@ void main() {
     expect(lock.calls, 2);
   });
 
+  testWidgets('Google sign-in screens are not "leaving" the app', (
+    tester,
+  ) async {
+    lock.results.add(LockAuthResult.success);
+    await pump(tester);
+    expect(lock.calls, 1);
+    final signIn = Completer<void>();
+    final flow = LockGate.duringExternalFlow(() => signIn.future);
+    // "Immediately" would lock on any real trip away.
+    await leaveFor(tester, const Duration(minutes: 2));
+    signIn.complete();
+    await flow;
+    await tester.pump();
+    expect(locked(tester), isFalse);
+    expect(lock.calls, 1);
+    // After sign-in, leaving the app locks it again.
+    lock.results.add(LockAuthResult.success);
+    await leaveFor(tester, const Duration(seconds: 1));
+    expect(lock.calls, 2);
+  });
+
   testWidgets('the system PIN screen pausing the app is not "leaving" it', (
     tester,
   ) async {

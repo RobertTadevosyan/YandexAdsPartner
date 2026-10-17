@@ -16,7 +16,7 @@ class TrendLineChart extends StatelessWidget {
   final String unit;
   final String? currency;
   final String lang;
-  final Color color;
+  final Color? color;
   final double height;
 
   const TrendLineChart({
@@ -24,7 +24,7 @@ class TrendLineChart extends StatelessWidget {
     required this.unit,
     required this.lang,
     this.currency,
-    this.color = Brand.chartLine,
+    this.color,
     this.height = 180,
     super.key,
   });
@@ -32,6 +32,7 @@ class TrendLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final color = this.color ?? BrandPalette.of(context).chartLine;
     if (samples.isEmpty) return SizedBox(height: height);
     final maxY = samples.fold<double>(0, (m, s) => s.value > m ? s.value : m);
     final top = maxY == 0 ? 1.0 : maxY * 1.15;
@@ -188,7 +189,7 @@ class RankingBars extends StatelessWidget {
   final String unit;
   final String? currency;
   final String lang;
-  final Color color;
+  final Color? color;
   final void Function(String label)? onTap;
 
   const RankingBars({
@@ -196,7 +197,7 @@ class RankingBars extends StatelessWidget {
     required this.unit,
     required this.lang,
     this.currency,
-    this.color = Brand.chartLine,
+    this.color,
     this.onTap,
     super.key,
   });
@@ -204,6 +205,7 @@ class RankingBars extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final color = this.color ?? BrandPalette.of(context).chartLine;
     final max = entries.fold<double>(0, (m, e) => e.value > m ? e.value : m);
     return Column(
       children: [
