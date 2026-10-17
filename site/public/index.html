@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdPocket — Yandex Advertising Network and AdMob revenue on your phone</title>
+<meta name="description" content="AdPocket shows your Yandex Advertising Network and Google AdMob revenue and reports on your phone. Read-only, no server: your data stays on your device.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+  :root{--fg:#14213d;--muted:#5b6b82;--accent:#8a6500;--amber:#ffc107;--navy:#102840;--bg:#fff;--card:#f5f6f8;--line:#e1e6ec;--blue:#1a73e8}
+  @media (prefers-color-scheme:dark){:root{--fg:#f1f4f8;--muted:#b8c4d6;--accent:#ffc107;--bg:#102840;--card:#1a334d;--line:#2b4160;--blue:#8ab4f8}}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);margin:0;line-height:1.6}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 16px 64px}
+  header{display:flex;align-items:center;gap:14px}
+  header img{width:56px;height:56px;border-radius:14px}
+  header .name{font-weight:800;font-size:1.4rem}
+  header .lang{margin-left:auto;display:flex;gap:6px}
+  .lang a{padding:4px 12px;border:1px solid var(--line);border-radius:20px;text-decoration:none;color:var(--fg);font-weight:600;font-size:.9rem}
+  .lang a.plain{border:none;padding:4px 6px;color:var(--accent);white-space:nowrap}
+  @media (max-width:420px){header .name{font-size:1.15rem} header img{width:44px;height:44px}}
+  .lang a.on{background:var(--amber);color:var(--navy);border-color:var(--amber)}
+  h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.15;margin:40px 0 12px}
+  .lead{font-size:1.15rem;color:var(--muted);max-width:640px}
+  .stores{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}
+  .btn{display:inline-block;padding:10px 18px;border-radius:12px;font-weight:700;text-decoration:none}
+  .btn.primary{background:var(--amber);color:var(--navy)}
+  .btn.ghost{border:1px solid var(--line);color:var(--fg)}
+  .shots{display:flex;gap:14px;overflow-x:auto;padding:8px 0 16px;margin:16px 0}
+  .shots img{width:220px;height:auto;border-radius:18px;border:1px solid var(--line);flex:none}
+  h2{font-size:1.35rem;margin-top:44px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .card{background:var(--card);border-radius:14px;padding:16px 18px}
+  .card h3{margin:0 0 6px;font-size:1.02rem}
+  .card p{margin:0;color:var(--muted)}
+  .google{border-left:4px solid var(--blue)}
+  ul{padding-left:1.2rem}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font-size:.9rem}
+  code{overflow-wrap:anywhere}
+  a{color:var(--accent)}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <img src="/img/icon.png" alt="AdPocket icon">
+  <span class="name">AdPocket</span>
+  <nav class="lang"><a href="/privacy" class="plain">Privacy Policy</a><a href="#en" id="tab-en" class="on">EN</a><a href="#ru" id="tab-ru">RU</a></nav>
+</header>
+
+<main id="sec-en">
+  <h1>AdPocket</h1>
+  <p class="lead"><b>Your ad revenue, in your pocket.</b> AdPocket is a mobile app for Android and iOS for app and website publishers. It shows today's revenue, trends and full reports from <b>Yandex Advertising Network</b> and <b>Google AdMob</b> on your phone and home-screen widget. It only reads statistics and has no server: everything stays on your device.</p>
+  <div class="card"><h3>Purpose of the app</h3><p>AdPocket lets publishers check the earnings of their own advertising accounts on their phone. It is a read-only viewer: when you connect Google AdMob, AdPocket uses your permission only to download your own AdMob reports (earnings, impressions, clicks, requests) and display them to you. It does not create, edit or share content, does not use Google data for advertising or AI, and is free to use without an AdPocket account. The website is public and needs no login.</p></div>
+  <div class="stores">
+    <a class="btn primary" href="https://apps.apple.com/app/id6814641528">App Store</a>
+    <a class="btn primary" href="https://play.google.com/store/apps/details?id=app.adpocket.yan">Google Play</a>
+    <a class="btn ghost" href="/privacy">Privacy policy</a>
+  </div>
+  <div class="shots">
+    <img src="/img/overview-en.jpg" alt="Overview screen: today's revenue, yesterday, week and month" loading="lazy">
+    <img src="/img/reports-en.jpg" alt="Reports screen with filters and groupings" loading="lazy">
+    <img src="/img/widget-en.jpg" alt="Home-screen widget with today's revenue" loading="lazy">
+  </div>
+
+  <h2>What it does</h2>
+  <div class="grid">
+    <div class="card"><h3>Today at a glance</h3><p>Revenue, impressions, clicks and eCPM for today, with yesterday, the last 7 days and the month for comparison.</p></div>
+    <div class="card"><h3>Full reports</h3><p>Any period, metrics, groupings and filters, with totals, charts, sorting and CSV export.</p></div>
+    <div class="card"><h3>Widgets and alerts</h3><p>Home-screen widgets for Android and iOS and optional local notifications with your daily revenue.</p></div>
+    <div class="card"><h3>Several accounts</h3><p>Add Yandex and AdMob accounts side by side and switch between them in one tap.</p></div>
+    <div class="card"><h3>App lock</h3><p>Optional Face ID, fingerprint or device passcode lock.</p></div>
+    <div class="card"><h3>No server, no tracking</h3><p>No sign-up, no analytics, no ads. Statistics go straight from Yandex or Google to your device.</p></div>
+  </div>
+
+  <h2>Connecting your accounts</h2>
+  <div class="grid">
+    <div class="card"><h3>Yandex Advertising Network</h3><p>Paste the free read-only Statistics API token from partner.yandex.ru. It is kept in the device's secure storage.</p></div>
+    <div class="card google"><h3>Google AdMob</h3><p>Tap "Sign in with Google" and allow read-only access to your AdMob reports. Then pick the AdMob account to show.</p></div>
+  </div>
+
+  <h2>How AdPocket uses Google user data</h2>
+  <div class="card google">
+    <ul>
+      <li><b>What it asks for:</b> your Google account's e-mail address (to label the account) and the <code>admob.readonly</code> scope, which is read-only access to your AdMob reports, apps and account list. AdPocket cannot change anything in AdMob.</li>
+      <li><b>What it does with it:</b> it requests your AdMob network and mediation reports (earnings, impressions, clicks, requests and related metrics) and shows them in the app and its widget. That is the only use.</li>
+      <li><b>Where it goes:</b> requests go directly from your device to Google's AdMob API. Results are cached on your device only. AdPocket has no server, and no Google data is sent to the developer or to anyone else.</li>
+      <li><b>How to stop it:</b> remove the AdMob account in the app (Settings → Accounts), which also revokes AdPocket's access. You can also revoke access at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</li>
+    </ul>
+    <p>AdPocket's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. Details are in the <a href="/privacy">privacy policy</a>.</p>
+  </div>
+
+  <footer>
+    <p>AdPocket is an independent app by Robert Tadevosyan. It is not affiliated with or endorsed by Yandex or Google. Yandex and Google AdMob are trademarks of their owners.</p>
+    <p>Contact: <a href="mailto:robtdyn@gmail.com">robtdyn@gmail.com</a> · <a href="/privacy">Privacy policy</a> · <a href="https://github.com/RobertTadevosyan/YandexAdsPartner">Source code</a></p>
+  </footer>
+</main>
+
+<main id="sec-ru" hidden lang="ru">
+  <h1>AdPocket</h1>
+  <p class="lead"><b>Доход от рекламы — у вас в кармане.</b></p>
+  <p class="lead">AdPocket — мобильное приложение для владельцев приложений и сайтов. Оно показывает доход за сегодня, динамику и полные отчёты <b>Рекламной сети Яндекса</b> и <b>Google AdMob</b> на телефоне и в виджете. Приложение только читает статистику и не имеет своего сервера: все данные остаются на устройстве.</p>
+  <div class="stores">
+    <a class="btn primary" href="https://apps.apple.com/app/id6814641528">App Store</a>
+    <a class="btn primary" href="https://play.google.com/store/apps/details?id=app.adpocket.yan">Google Play</a>
+    <a class="btn ghost" href="/privacy#ru">Политика конфиденциальности</a>
+  </div>
+  <div class="shots">
+    <img src="/img/overview-ru.jpg" alt="Обзор: доход за сегодня, вчера, неделю и месяц" loading="lazy">
+    <img src="/img/reports-ru.jpg" alt="Отчёты с фильтрами и группировками" loading="lazy">
+    <img src="/img/widget-ru.jpg" alt="Виджет с доходом за сегодня" loading="lazy">
+  </div>
+
+  <h2>Возможности</h2>
+  <div class="grid">
+    <div class="card"><h3>Сегодня одним взглядом</h3><p>Доход, показы, клики и eCPM за сегодня в сравнении со вчера, последними 7 днями и месяцем.</p></div>
+    <div class="card"><h3>Полные отчёты</h3><p>Любой период, показатели, группировки и фильтры, с итогами, графиками, сортировкой и экспортом в CSV.</p></div>
+    <div class="card"><h3>Виджеты и уведомления</h3><p>Виджеты для Android и iOS и, по желанию, локальные уведомления о доходе за день.</p></div>
+    <div class="card"><h3>Несколько аккаунтов</h3><p>Аккаунты Яндекса и AdMob рядом, переключение в одно касание.</p></div>
+    <div class="card"><h3>Блокировка</h3><p>Необязательная блокировка Face ID, отпечатком пальца или кодом устройства.</p></div>
+    <div class="card"><h3>Без сервера и слежки</h3><p>Без регистрации, аналитики и рекламы. Статистика идёт напрямую от Яндекса или Google на ваше устройство.</p></div>
+  </div>
+
+  <h2>Подключение аккаунтов</h2>
+  <div class="grid">
+    <div class="card"><h3>Рекламная сеть Яндекса</h3><p>Вставьте бесплатный OAuth‑токен API статистики (только чтение) из partner.yandex.ru. Он хранится в защищённом хранилище устройства.</p></div>
+    <div class="card google"><h3>Google AdMob</h3><p>Нажмите «Войти через Google» и разрешите доступ к отчётам AdMob только на чтение. Затем выберите аккаунт AdMob.</p></div>
+  </div>
+
+  <h2>Как AdPocket использует данные Google</h2>
+  <div class="card google">
+    <ul>
+      <li><b>Что запрашивается:</b> адрес e‑mail Google‑аккаунта (чтобы подписать аккаунт в приложении) и разрешение <code>admob.readonly</code>: доступ только на чтение к отчётам, приложениям и списку аккаунтов AdMob. AdPocket ничего не может изменить в AdMob.</li>
+      <li><b>Зачем:</b> чтобы запрашивать отчёты AdMob (сеть и медиация: доход, показы, клики, запросы и связанные показатели) и показывать их в приложении и виджете. Других целей нет.</li>
+      <li><b>Куда передаются:</b> запросы идут напрямую с устройства в AdMob API Google. Результаты кэшируются только на устройстве. У AdPocket нет сервера; данные Google не передаются разработчику или кому‑либо ещё.</li>
+      <li><b>Как отключить:</b> удалите аккаунт AdMob в приложении («Настройки → Аккаунты»), при этом доступ AdPocket отзывается. Также доступ можно отозвать на <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</li>
+    </ul>
+    <p>Использование и передача информации, полученной из API Google, соответствуют <a href="https://developers.google.com/terms/api-services-user-data-policy">Правилам в отношении пользовательских данных в сервисах Google API</a>, включая требования ограниченного использования (Limited Use). Подробнее — в <a href="/privacy#ru">политике конфиденциальности</a>.</p>
+  </div>
+
+  <footer>
+    <p>AdPocket — независимое приложение Роберта Тадевосяна. Оно не связано с Яндексом или Google и не одобрено ими. Яндекс и Google AdMob — товарные знаки их владельцев.</p>
+    <p>Контакт: <a href="mailto:robtdyn@gmail.com">robtdyn@gmail.com</a> · <a href="/privacy#ru">Политика конфиденциальности</a> · <a href="https://github.com/RobertTadevosyan/YandexAdsPartner">Исходный код</a></p>
+  </footer>
+</main>
+</div>
+<script>
+(function(){
+  var ru=document.getElementById('sec-ru'),en=document.getElementById('sec-en'),tr=document.getElementById('tab-ru'),te=document.getElementById('tab-en');
+  function show(l){var e=l==='en';en.hidden=!e;ru.hidden=e;te.classList.toggle('on',e);tr.classList.toggle('on',!e);document.documentElement.lang=l;}
+  tr.onclick=function(ev){ev.preventDefault();show('ru');history.replaceState(null,'','#ru');};
+  te.onclick=function(ev){ev.preventDefault();show('en');history.replaceState(null,'','#en');};
+  var h=location.hash.replace('#','');
+  if(h==='en'||h==='ru'){show(h);}else if(/^ru/i.test(navigator.language||'')){show('ru');}
+})();
+</script>
+</body>
+</html>

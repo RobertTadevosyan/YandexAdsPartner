@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdPocket Privacy Policy / Политика конфиденциальности AdPocket</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+  :root{--fg:#14213d;--muted:#5b6b82;--accent:#8a6500;--bg:#fff;--card:#f5f6f8;--line:#e1e6ec}
+  @media (prefers-color-scheme:dark){:root{--fg:#f1f4f8;--muted:#b8c4d6;--accent:#ffc107;--bg:#102840;--card:#1a334d;--line:#2b4160}}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);max-width:760px;margin:0 auto;padding:32px 16px 64px;line-height:1.6}
+  h1{font-size:1.7rem;margin:.2rem 0 0} h2{font-size:1.2rem;margin-top:2rem;border-top:1px solid var(--line);padding-top:1.2rem}
+  .meta{color:var(--muted);font-size:.9rem}
+  .lang{display:flex;gap:8px;margin:18px 0}
+  .lang a{padding:6px 14px;border:1px solid var(--line);border-radius:20px;text-decoration:none;color:var(--fg);font-weight:600}
+  .lang a.on{background:#ffc107;color:#102840;border-color:#ffc107}
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:.95rem} td,th{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)} code{background:var(--card);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+  .card{background:var(--card);border-radius:12px;padding:14px 16px;margin:14px 0}
+  a{color:var(--accent)}
+  [hidden]{display:none}
+</style>
+</head>
+<body>
+<p class="meta"><a href="/">← AdPocket</a></p>
+<h1>AdPocket</h1>
+<p class="meta">app.adpocket.yan · Android / iOS</p>
+<div class="lang"><a href="#en" id="tab-en" class="on">English</a><a href="#ru" id="tab-ru">Русский</a></div>
+
+<section id="sec-en">
+<h1>AdPocket Privacy Policy</h1>
+<p class="meta">Last updated: 18 October 2026 · Applies to the AdPocket app for Android and iOS (app.adpocket.yan) and this website.</p>
+<div class="card"><b>Summary of data collection and use</b>
+<ul>
+<li><b>What AdPocket collects:</b> only what you enter or authorise in the app: a Yandex Statistics API token, or, when you connect AdMob, your Google account name and e-mail address and read-only access to your AdMob reports (scope <code>admob.readonly</code>).</li>
+<li><b>How it is used:</b> solely to request your own advertising statistics from Yandex or Google and show them to you in the app and its widget.</li>
+<li><b>Where it is kept:</b> only on your device. AdPocket has no server and receives no copy of your data.</li>
+<li><b>Sharing:</b> none. Data is never sold, shared with third parties, used for advertising or used to train AI models.</li>
+<li><b>Deletion:</b> remove the account in the app (Settings → Accounts) or uninstall the app; Google access can also be revoked at myaccount.google.com/permissions.</li>
+</ul></div>
+<div class="card"><b>In short.</b> AdPocket is an independent app for viewing advertising statistics from Yandex Advertising Network (YAN) and Google AdMob. It has no server of its own. Your credentials and all statistics stay on your device and are sent only to Yandex's or Google's API. The app contains no ads, analytics or trackers and sends nothing to the developer or any third party.</div>
+<p>AdPocket is not an official Yandex or Google application. Yandex, Yandex Advertising Network, Google and AdMob are trademarks of their respective owners.</p>
+
+<h2>1. Who processes the data</h2>
+<p>The app developer ("we") is an individual; contact details are in section 11. The app runs entirely on your device; we do not receive, see or store your data.</p>
+
+<h2>2. What data the app uses and where it is stored</h2>
+<div class="tbl"><table>
+<tr><th>Data</th><th>Purpose</th><th>Where it is stored</th></tr>
+<tr><td>YAN Statistics API OAuth token (one per Yandex account you add)</td><td>Requesting statistics from Yandex's API on your behalf</td><td>On the device only: Android Keystore / iOS Keychain. On iOS the token is also readable by the app's widget through a shared Keychain access group.</td></tr>
+<tr><td>YAN Inventory API OAuth token (optional)</td><td>Managing ad units on the "Ad units" tab</td><td>On the device only, system secure storage</td></tr>
+<tr><td>Google account access for AdMob (when you connect an AdMob account)</td><td>Reading your AdMob reports on your behalf</td><td>The sign-in grant is held by Google's sign-in service on the device (Google Play services on Android, the Google Sign-In SDK on iOS). AdPocket keeps short-lived access tokens in memory only and never writes them to storage.</td></tr>
+<tr><td>Google account e-mail address and name, AdMob publisher ID</td><td>Labelling the AdMob account and requesting its reports</td><td>On the device only</td></tr>
+<tr><td>Account label (a name you type, the Yandex login or the Google account name)</td><td>Telling several accounts apart</td><td>On the device only</td></tr>
+<tr><td>Statistics (revenue, impressions, clicks, requests, reports) and their cache, including AdMob app and ad unit names</td><td>Display on screens and in the widget</td><td>On the device only; on iOS also in the shared App Group container for the widget</td></tr>
+<tr><td>Settings: language, currency, VAT, theme, app lock, widget options, saved report presets</td><td>App operation</td><td>On the device only</td></tr>
+</table></div>
+<p>The app does not collect or store your phone number, location, contacts, advertising identifiers, usage data or crash reports. There are no accounts on our side.</p>
+
+<h2>3. Google user data (AdMob)</h2>
+<p>If you choose to connect an AdMob account, AdPocket asks you to sign in with Google and requests these permissions:</p>
+<ul>
+<li>your Google account's basic profile (name and e-mail address), used only to label the account in the app and to pick the right Google account for later requests;</li>
+<li><code>https://www.googleapis.com/auth/admob.readonly</code>, which gives read-only access to your AdMob account list, apps, ad units and reports. AdPocket cannot change any AdMob setting.</li>
+</ul>
+<p><b>How it is used.</b> AdPocket uses this access only to request your AdMob network and mediation reports and the list of your AdMob accounts and apps, and to show them in the app, its reports and its home-screen widget. It is not used for advertising, profiling, selling data, training AI models or any purpose other than showing you your own statistics.</p>
+<p><b>Sharing.</b> Requests go directly from your device to Google's AdMob API (<code>admob.googleapis.com</code>). AdPocket has no server, and Google user data is never transferred to the developer or to any third party. No human reads it.</p>
+<p><b>Storage and deletion.</b> Report results are cached on your device only, as described in section 2. Removing the AdMob account in the app (Settings → Accounts → Remove account) deletes its cached data and revokes AdPocket's access to your Google account. You can also revoke access at any time at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Uninstalling the app deletes all of its data.</p>
+<div class="card">AdPocket's use and transfer of information received from Google APIs to any other app adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.</div>
+
+<h2>4. Who receives data</h2>
+<p>Network requests go only to:</p>
+<ul>
+<li><b>Yandex</b>: <code>partner2.yandex.ru</code> and <code>partner.yandex.ru</code> (Yandex Advertising Network API), for Yandex accounts. Each request carries your OAuth token in the Authorization header plus report parameters (period, metrics, filters, language, currency). Yandex's handling of that data is governed by its own documents: the Partner Interface API User Agreement and the Yandex Privacy Policy.</li>
+<li><b>Google</b>: Google's sign-in service and <code>admob.googleapis.com</code>, for AdMob accounts. Each request carries a Google access token plus report parameters. Google's handling of that data is governed by the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</li>
+</ul>
+<p>We share data with no one else. The app contains no analytics SDKs, advertising SDKs, crash reporters or push servers.</p>
+
+<h2>5. Permissions and device features</h2>
+<ul>
+<li><b>Internet</b>: requests to Yandex's and Google's APIs.</li>
+<li><b>Biometrics / device credential</b> (Android USE_BIOMETRIC, iOS Face ID / Touch ID): only if you enable "App lock". Biometric data is handled by the operating system and never reaches the app.</li>
+<li><b>Home-screen widget</b>: shows cached statistics. On Android, with "Background refresh" on, the app requests statistics about every 30 minutes. On iOS the widget refreshes Yandex statistics itself on the system's schedule; AdMob statistics are updated when you open the app.</li>
+<li><b>Battery optimisation</b> (Android): with your consent the app opens the system battery-optimisation list so you can exclude AdPocket and keep the widget's background refresh running. No special permission is requested for this.</li>
+<li><b>Notifications</b>: local, generated on the device on your schedule; no push servers are used.</li>
+</ul>
+
+<h2>6. Retention and deletion</h2>
+<p>Data stays on the device for as long as you use the app. Remove an account and its credentials via Settings → Accounts → Remove account; clear cached reports via "Clear report cache". Uninstalling the app deletes all its data. You can revoke a Yandex token in the partner.yandex.ru interface and Google access at myaccount.google.com/permissions.</p>
+
+<h2>7. Security</h2>
+<p>Credentials live in the operating system's secure store or with Google's sign-in service, and all requests use HTTPS. We recommend enabling "App lock" if others use your device. We cannot recover tokens or data because we never have them.</p>
+
+<h2>8. Children</h2>
+<p>The app is intended for advertising publishers and is not directed at anyone under 18.</p>
+
+<h2>9. Your rights</h2>
+<p>Because the data exists only on your device, you control it fully: viewing, changing and deleting are available in the app. For questions about data processed by Yandex or Google, contact their support.</p>
+
+<h2>10. Changes to this policy</h2>
+<p>If data practices change we will update this page and the "Last updated" date. Material changes will be noted in the app's release notes.</p>
+
+<h2>11. Contact</h2>
+<p>Questions about this policy: <a href="mailto:robtdyn@gmail.com">robtdyn@gmail.com</a>. Source code: <a href="https://github.com/RobertTadevosyan/YandexAdsPartner">github.com/RobertTadevosyan/YandexAdsPartner</a>.</p>
+</section>
+
+<section id="sec-ru" hidden lang="ru">
+<h1>Политика конфиденциальности AdPocket</h1>
+<p class="meta">Последнее обновление: 18 октября 2026 г. · Относится к приложению AdPocket для Android и iOS (app.adpocket.yan) и этому сайту.</p>
+<div class="card"><b>Коротко.</b> AdPocket — независимое приложение для просмотра статистики Рекламной сети Яндекса (РСЯ) и Google AdMob. Оно не имеет собственного сервера. Ваши учётные данные и вся статистика хранятся только на устройстве и передаются только в API Яндекса или Google. Приложение не содержит рекламы, аналитики и трекеров и не передаёт данные разработчику или третьим лицам.</div>
+<p>AdPocket не является официальным приложением Яндекса или Google. Яндекс, Рекламная сеть Яндекса, Google и AdMob — товарные знаки их владельцев.</p>
+
+<h2>1. Кто обрабатывает данные</h2>
+<p>Разработчик приложения (далее «мы») — физическое лицо, контакт указан в разделе 11. Приложение работает полностью на устройстве пользователя; мы не получаем доступ к вашим данным, не видим их и не храним.</p>
+
+<h2>2. Какие данные использует приложение и где они хранятся</h2>
+<div class="tbl"><table>
+<tr><th>Данные</th><th>Зачем</th><th>Где хранятся</th></tr>
+<tr><td>OAuth‑токен API статистики РСЯ (один на каждый аккаунт Яндекса)</td><td>Запросы статистики к API Яндекса от вашего имени</td><td>Только на устройстве: Android Keystore / iOS Keychain. На iOS токен доступен также виджету через общую группу Keychain.</td></tr>
+<tr><td>OAuth‑токен Inventory API РСЯ (необязательно)</td><td>Управление рекламными блоками в разделе «Блоки»</td><td>Только на устройстве, защищённое хранилище системы</td></tr>
+<tr><td>Доступ к Google‑аккаунту для AdMob (если вы подключили аккаунт AdMob)</td><td>Чтение ваших отчётов AdMob от вашего имени</td><td>Разрешение хранит служба входа Google на устройстве (Google Play services на Android, Google Sign-In SDK на iOS). AdPocket держит краткоживущие токены доступа только в памяти и не записывает их.</td></tr>
+<tr><td>E‑mail и имя Google‑аккаунта, идентификатор издателя AdMob</td><td>Подпись аккаунта AdMob и запросы его отчётов</td><td>Только на устройстве</td></tr>
+<tr><td>Название аккаунта (ваша метка, логин Яндекса или имя Google‑аккаунта)</td><td>Различать несколько аккаунтов</td><td>Только на устройстве</td></tr>
+<tr><td>Статистика (доход, показы, клики, запросы, отчёты) и её кэш, включая названия приложений и блоков AdMob</td><td>Отображение на экранах и в виджете</td><td>Только на устройстве; на iOS — также в общем контейнере App Group для виджета</td></tr>
+<tr><td>Настройки: язык, валюта, НДС, тема, блокировка, параметры виджета, шаблоны отчётов</td><td>Работа приложения</td><td>Только на устройстве</td></tr>
+</table></div>
+<p>Приложение не собирает и не хранит номер телефона, геолокацию, контакты, идентификаторы рекламы, данные об использовании, отчёты об ошибках. У приложения нет учётных записей на нашей стороне.</p>
+
+<h2>3. Данные пользователя Google (AdMob)</h2>
+<p>Если вы подключаете аккаунт AdMob, AdPocket предлагает войти через Google и запрашивает разрешения:</p>
+<ul>
+<li>базовый профиль Google‑аккаунта (имя и e‑mail) — только чтобы подписать аккаунт в приложении и выбирать нужный Google‑аккаунт для запросов;</li>
+<li><code>https://www.googleapis.com/auth/admob.readonly</code> — доступ только на чтение к списку аккаунтов, приложениям, рекламным блокам и отчётам AdMob. AdPocket не может изменить настройки AdMob.</li>
+</ul>
+<p><b>Как используется.</b> Только для запроса отчётов AdMob (сеть и медиация), списка аккаунтов и приложений AdMob и их показа в приложении, отчётах и виджете. Данные не используются для рекламы, профилирования, продажи, обучения моделей ИИ или любых других целей, кроме показа вам вашей статистики.</p>
+<p><b>Передача.</b> Запросы идут напрямую с устройства в AdMob API Google (<code>admob.googleapis.com</code>). У AdPocket нет сервера; данные пользователя Google не передаются разработчику или третьим лицам. Никто их не просматривает.</p>
+<p><b>Хранение и удаление.</b> Результаты отчётов кэшируются только на устройстве (см. раздел 2). Удаление аккаунта AdMob в приложении («Настройки → Аккаунты → Удалить аккаунт») удаляет его кэш и отзывает доступ AdPocket к Google‑аккаунту. Доступ также можно отозвать в любой момент на <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Удаление приложения удаляет все его данные.</p>
+<div class="card">Использование и передача AdPocket информации, полученной из API Google, соответствуют <a href="https://developers.google.com/terms/api-services-user-data-policy">Правилам в отношении пользовательских данных в сервисах Google API</a>, включая требования ограниченного использования (Limited Use).</div>
+
+<h2>4. Кому передаются данные</h2>
+<p>Сетевые запросы отправляются только:</p>
+<ul>
+<li><b>Яндексу</b>: <code>partner2.yandex.ru</code> и <code>partner.yandex.ru</code> (API Рекламной сети Яндекса) — для аккаунтов Яндекса. В каждом запросе передаётся OAuth‑токен в заголовке Authorization и параметры отчёта (период, показатели, фильтры, язык, валюта). Обработка данных Яндексом регулируется его документами: Пользовательским соглашением API Партнёрского интерфейса и Политикой конфиденциальности Яндекса.</li>
+<li><b>Google</b>: службе входа Google и <code>admob.googleapis.com</code> — для аккаунтов AdMob. В каждом запросе передаётся токен доступа Google и параметры отчёта. Обработка данных Google регулируется <a href="https://policies.google.com/privacy?hl=ru">Политикой конфиденциальности Google</a>.</li>
+</ul>
+<p>Мы не передаём данные никому другому. В приложении нет SDK аналитики, рекламных SDK, сервисов сбора ошибок и push‑серверов.</p>
+
+<h2>5. Разрешения и функции устройства</h2>
+<ul>
+<li><b>Интернет</b> — запросы к API Яндекса и Google.</li>
+<li><b>Биометрия / код устройства</b> (Android USE_BIOMETRIC, iOS Face ID / Touch ID) — только если вы включите «Блокировку приложения». Биометрические данные обрабатываются операционной системой и не передаются приложению.</li>
+<li><b>Виджет</b> — показывает кэшированную статистику. На Android при включённом «Фоновом обновлении» приложение запрашивает статистику примерно каждые 30 минут. На iOS виджет сам обновляет статистику Яндекса по расписанию системы; статистика AdMob обновляется при открытии приложения.</li>
+<li><b>Оптимизация батареи</b> (Android) — по вашему согласию приложение открывает системный список оптимизации батареи, чтобы фоновое обновление виджета не останавливалось. Специальных разрешений не запрашивается.</li>
+<li><b>Уведомления</b> — локальные, формируются на устройстве по вашему расписанию; push‑серверы не используются.</li>
+</ul>
+
+<h2>6. Сроки хранения и удаление</h2>
+<p>Данные хранятся на устройстве, пока вы пользуетесь приложением. Удалить аккаунт и его учётные данные можно в «Настройки → Аккаунты → Удалить аккаунт»; кэш отчётов — «Очистить кэш отчётов». Удаление приложения удаляет все его данные. Токен Яндекса можно отозвать в partner.yandex.ru, доступ Google — на myaccount.google.com/permissions.</p>
+
+<h2>7. Безопасность</h2>
+<p>Учётные данные хранятся в защищённом хранилище системы или у службы входа Google, все запросы идут по HTTPS. Рекомендуем включить «Блокировку приложения», если устройством пользуется кто‑то ещё. Мы не можем восстановить токены или данные — у нас их нет.</p>
+
+<h2>8. Дети</h2>
+<p>Приложение предназначено для рекламных партнёров и не адресовано лицам младше 18 лет.</p>
+
+<h2>9. Ваши права</h2>
+<p>Поскольку данные находятся только на вашем устройстве, вы полностью контролируете их: просмотр, изменение и удаление доступны в приложении. По вопросам о данных, обрабатываемых Яндексом или Google, обращайтесь в их поддержку.</p>
+
+<h2>10. Изменения политики</h2>
+<p>При изменении практики обработки данных мы обновим эту страницу и дату «Последнее обновление». Существенные изменения будут отмечены в описании обновления приложения.</p>
+
+<h2>11. Контакты</h2>
+<p>Вопросы по политике: <a href="mailto:robtdyn@gmail.com">robtdyn@gmail.com</a>. Исходный код: <a href="https://github.com/RobertTadevosyan/YandexAdsPartner">github.com/RobertTadevosyan/YandexAdsPartner</a>.</p>
+</section>
+
+<script>
+(function(){
+  var ru=document.getElementById('sec-ru'),en=document.getElementById('sec-en'),tr=document.getElementById('tab-ru'),te=document.getElementById('tab-en');
+  function show(l){var e=l==='en';en.hidden=!e;ru.hidden=e;te.classList.toggle('on',e);tr.classList.toggle('on',!e);document.documentElement.lang=l;}
+  tr.onclick=function(ev){ev.preventDefault();show('ru');history.replaceState(null,'','#ru');};
+  te.onclick=function(ev){ev.preventDefault();show('en');history.replaceState(null,'','#en');};
+  var h=location.hash.replace('#','');
+  if(h==='en'||h==='ru'){show(h);}else if(/^ru/i.test(navigator.language||'')){show('ru');}
+})();
+</script>
+</body>
+</html>

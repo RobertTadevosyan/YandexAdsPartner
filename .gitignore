@@ -86,3 +86,6 @@ test/failures/
 # promo video toolchain (installed per machine)
 docs/store/tools/video/node_modules/
 docs/store/tools/video/package*.json
+
+# Firebase Hosting cache
+site/.firebase/
