@@ -225,6 +225,13 @@ class AppStrings {
     'lock.subtitle': 'Подтвердите личность, чтобы открыть статистику',
     'lock.unlock': 'Разблокировать',
     'lock.reason': 'Разблокируйте AdPocket',
+    'lock.lockedOut':
+        'Слишком много попыток. Разблокируйте телефон и попробуйте снова.',
+    'set.lockAfter': 'Блокировать через',
+    'set.lockAfterHint':
+        'Сколько приложение может быть в фоне без повторной проверки',
+    'set.lockAfter.now': 'Сразу',
+    'set.lockAfter.min': '%d мин',
     'set.widgets': 'Виджет на главном экране',
     'set.widgetAdd': 'Добавить виджет',
     'set.widgetAddHint':
@@ -509,6 +516,12 @@ class AppStrings {
     'lock.subtitle': 'Confirm it is you to see your statistics',
     'lock.unlock': 'Unlock',
     'lock.reason': 'Unlock AdPocket',
+    'lock.lockedOut': 'Too many attempts. Unlock your phone, then try again.',
+    'set.lockAfter': 'Lock after',
+    'set.lockAfterHint':
+        'How long the app can stay in the background before asking again',
+    'set.lockAfter.now': 'Immediately',
+    'set.lockAfter.min': '%d min',
     'set.widgets': 'Home-screen widget',
     'set.widgetAdd': 'Add widget',
     'set.widgetAddHint':

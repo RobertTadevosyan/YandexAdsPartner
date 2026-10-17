@@ -212,8 +212,12 @@ class SettingsScreen extends StatelessWidget {
       );
       return;
     }
-    final ok = await service.authenticate(s['lock.reason']);
-    if (ok) await settings.setAppLock(enable);
+    final result = await service.authenticate(s['lock.reason']);
+    if (result == LockAuthResult.success) {
+      await settings.setAppLock(enable);
+    } else if (result == LockAuthResult.lockedOut) {
+      messenger.showSnackBar(SnackBar(content: Text(s['lock.lockedOut'])));
+    }
   }
 
   @override
@@ -377,6 +381,38 @@ class SettingsScreen extends StatelessWidget {
                     subtitle: Text(s['set.appLockHint']),
                     value: settings.appLock,
                     onChanged: (v) => _toggleAppLock(context, settings, v),
+                  ),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    enabled: settings.appLock,
+                    leading: const Icon(Icons.timer_outlined),
+                    title: Text(s['set.lockAfter']),
+                    subtitle: Text(s['set.lockAfterHint']),
+                    trailing: DropdownButton<int>(
+                      value: settings.lockTimeoutMinutes,
+                      underline: const SizedBox.shrink(),
+                      items: [
+                        for (final m in AppSettings.lockTimeoutChoices)
+                          DropdownMenuItem(
+                            value: m,
+                            child: Text(
+                              m == 0
+                                  ? s['set.lockAfter.now']
+                                  : s['set.lockAfter.min'].replaceFirst(
+                                    '%d',
+                                    '$m',
+                                  ),
+                            ),
+                          ),
+                      ],
+                      onChanged:
+                          settings.appLock
+                              ? (v) =>
+                                  v == null
+                                      ? null
+                                      : settings.setLockTimeoutMinutes(v)
+                              : null,
+                    ),
                   ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,

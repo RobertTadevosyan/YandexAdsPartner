@@ -11,6 +11,7 @@ class AppSettings extends ChangeNotifier {
   static const _kVat = 'settings.vat';
   static const _kTheme = 'settings.theme';
   static const _kAppLock = 'settings.appLock';
+  static const _kLockTimeout = 'settings.lockTimeoutMin';
   static const _kWidgetRefresh = 'settings.widgetRefresh';
   static const _kNotifyDaily = 'settings.notifyDaily';
   static const _kNotifyMonthly = 'settings.notifyMonthly';
@@ -25,6 +26,7 @@ class AppSettings extends ChangeNotifier {
   bool _vat;
   ThemeMode _themeMode;
   bool _appLock;
+  int _lockTimeoutMinutes;
   bool _widgetRefresh;
   bool _notifyDaily;
   bool _notifyMonthly;
@@ -38,6 +40,7 @@ class AppSettings extends ChangeNotifier {
     bool vat = false,
     ThemeMode themeMode = ThemeMode.system,
     bool appLock = false,
+    int lockTimeoutMinutes = 0,
     bool widgetRefresh = false,
     bool notifyDaily = false,
     bool notifyMonthly = false,
@@ -49,6 +52,7 @@ class AppSettings extends ChangeNotifier {
        _vat = vat,
        _themeMode = themeMode,
        _appLock = appLock,
+       _lockTimeoutMinutes = lockTimeoutMinutes,
        _widgetRefresh = widgetRefresh,
        _notifyDaily = notifyDaily,
        _notifyMonthly = notifyMonthly,
@@ -66,6 +70,12 @@ class AppSettings extends ChangeNotifier {
   bool get vat => _vat;
   ThemeMode get themeMode => _themeMode;
   bool get appLock => _appLock;
+
+  /// Minutes the app may spend in the background before it locks again;
+  /// 0 locks as soon as it leaves the screen.
+  int get lockTimeoutMinutes => _lockTimeoutMinutes;
+  Duration get lockTimeout => Duration(minutes: _lockTimeoutMinutes);
+  static const lockTimeoutChoices = [0, 1, 3, 5, 10, 15];
   bool get widgetRefresh => _widgetRefresh;
   bool get notifyDaily => _notifyDaily;
   bool get notifyMonthly => _notifyMonthly;
@@ -88,6 +98,10 @@ class AppSettings extends ChangeNotifier {
         orElse: () => ThemeMode.system,
       ),
       appLock: prefs.getBool(_kAppLock) ?? false,
+      lockTimeoutMinutes: () {
+        final v = prefs.getInt(_kLockTimeout) ?? 0;
+        return lockTimeoutChoices.contains(v) ? v : 0;
+      }(),
       widgetRefresh: prefs.getBool(_kWidgetRefresh) ?? false,
       notifyDaily: prefs.getBool(_kNotifyDaily) ?? false,
       notifyMonthly: prefs.getBool(_kNotifyMonthly) ?? false,
@@ -135,6 +149,16 @@ class AppSettings extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kAppLock, value);
+  }
+
+  Future<void> setLockTimeoutMinutes(int value) async {
+    if (value == _lockTimeoutMinutes || !lockTimeoutChoices.contains(value)) {
+      return;
+    }
+    _lockTimeoutMinutes = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kLockTimeout, value);
   }
 
   Future<void> setWidgetRefresh(bool value) async {
