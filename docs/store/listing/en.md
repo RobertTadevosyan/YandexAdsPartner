@@ -48,8 +48,8 @@ Open partner.yandex.ru, press the "API" button on the right panel, choose "Get O
 
 AdPocket is an independent application and is not affiliated with or endorsed by Yandex. Yandex and Yandex Advertising Network are trademarks of Yandex LLC.
 
-## What's new (release notes, 1.2.2)
-Works again while Yandex limits statistics requests to 8 days: the overview, the widgets and long reports are assembled from shorter requests, with a note on screen while this happens. Sorting a report no longer reloads it or jumps to the top.
+## What's new (release notes, 1.2.3)
+App lock: choose how long AdPocket can stay in the background before it locks again ("Lock after": immediately, 1, 3, 5, 10 or 15 minutes). The Unlock button works again after you close or fail the system prompt.
 
 ## Screenshot captions (in order)
 1. Your revenue today — with yesterday, the week and the month for context
