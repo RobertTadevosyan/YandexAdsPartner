@@ -1,12 +1,27 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:adpocket/core/session.dart';
 import 'package:adpocket/core/settings.dart';
 import 'package:adpocket/theme.dart';
+
+/// Result of one authentication attempt.
+enum LockAuthResult {
+  success,
+
+  /// Cancelled, failed or interrupted: stay locked, the user can try again.
+  retry,
+
+  /// Too many attempts; the system blocks biometrics for a while.
+  lockedOut,
+
+  /// The phone has no screen lock any more, so there is nothing to verify
+  /// against. The app lock cannot protect anything in that state.
+  noCredentials,
+}
 
 /// Thin wrapper over local_auth so screens and tests can swap it out.
 class AppLockService {
@@ -18,35 +33,57 @@ class AppLockService {
   Future<bool> isAvailable() async {
     try {
       return await _auth.isDeviceSupported();
-    } on PlatformException {
-      return false;
-    } on MissingPluginException {
+    } catch (_) {
       return false;
     }
   }
 
   /// Prompts for fingerprint / face, falling back to the device PIN.
-  Future<bool> authenticate(String reason) async {
+  ///
+  /// local_auth 3 reports a cancelled or interrupted prompt by throwing
+  /// LocalAuthException, not by returning false; every outcome is mapped here
+  /// so callers never see an exception.
+  Future<LockAuthResult> authenticate(String reason) async {
     try {
-      return await _auth.authenticate(
+      final ok = await _auth.authenticate(
         localizedReason: reason,
         biometricOnly: false,
         persistAcrossBackgrounding: true,
       );
-    } on PlatformException {
-      return false;
-    } on MissingPluginException {
-      return false;
+      return ok ? LockAuthResult.success : LockAuthResult.retry;
+    } on LocalAuthException catch (e) {
+      switch (e.code) {
+        case LocalAuthExceptionCode.noCredentialsSet:
+          return LockAuthResult.noCredentials;
+        case LocalAuthExceptionCode.temporaryLockout:
+        case LocalAuthExceptionCode.biometricLockout:
+          return LockAuthResult.lockedOut;
+        default:
+          return LockAuthResult.retry;
+      }
+    } catch (_) {
+      return LockAuthResult.retry;
     }
   }
 }
 
-/// Shows a lock screen over [child] whenever app lock is enabled: on cold
-/// start and every time the app returns from the background.
+/// Shows a lock screen over [child] when app lock is enabled: on start and
+/// when the app comes back from the background after longer than the
+/// "Lock after" setting (immediately by default).
 class LockGate extends StatefulWidget {
   final Widget child;
   final AppLockService? service;
-  const LockGate({required this.child, this.service, super.key});
+  final DateTime Function() clock;
+  const LockGate({
+    required this.child,
+    this.service,
+    this.clock = DateTime.now,
+    super.key,
+  });
+
+  /// When the app last went to the background, so the grace period also
+  /// holds when the system kills the app in the background.
+  static const backgroundAtKey = 'lock.backgroundAt';
 
   @override
   State<LockGate> createState() => _LockGateState();
@@ -57,6 +94,17 @@ class _LockGateState extends State<LockGate> with WidgetsBindingObserver {
   bool _locked = false;
   bool _prompting = false;
   bool _initialised = false;
+  DateTime? _backgroundAt;
+
+  /// Set only when the app really went to the background. System dialogs
+  /// (the biometric prompt itself) send "resumed" too, and a cancelled prompt
+  /// must not reopen by itself.
+  bool _wasAway = false;
+  String? _message;
+
+  bool get _enabled =>
+      context.read<AppSettings>().appLock &&
+      context.read<AppSession>().isSignedIn;
 
   @override
   void initState() {
@@ -69,9 +117,30 @@ class _LockGateState extends State<LockGate> with WidgetsBindingObserver {
     super.didChangeDependencies();
     if (_initialised) return;
     _initialised = true;
-    if (context.read<AppSettings>().appLock &&
-        context.read<AppSession>().isSignedIn) {
-      _locked = true;
+    if (!_enabled) return;
+    // Lock at start unless the app left the screen less than the grace
+    // period ago (the system may have killed it in the background).
+    _locked = true;
+    _restoreGrace();
+  }
+
+  Future<void> _restoreGrace() async {
+    final timeout = context.read<AppSettings>().lockTimeout;
+    var withinGrace = false;
+    if (timeout > Duration.zero) {
+      final prefs = await SharedPreferences.getInstance();
+      final at = prefs.getInt(LockGate.backgroundAtKey);
+      if (at != null) {
+        final away = widget.clock().difference(
+          DateTime.fromMillisecondsSinceEpoch(at),
+        );
+        withinGrace = !away.isNegative && away < timeout;
+      }
+    }
+    if (!mounted) return;
+    if (withinGrace) {
+      setState(() => _locked = false);
+    } else {
       WidgetsBinding.instance.addPostFrameCallback((_) => _unlock());
     }
   }
@@ -84,26 +153,62 @@ class _LockGateState extends State<LockGate> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!mounted) return;
-    final enabled =
-        context.read<AppSettings>().appLock &&
-        context.read<AppSession>().isSignedIn;
-    if (!enabled) return;
-    if (state == AppLifecycleState.paused && !_prompting) {
-      setState(() => _locked = true);
-    } else if (state == AppLifecycleState.resumed && _locked) {
-      _unlock();
+    if (!mounted || !_enabled) return;
+    // The system PIN screen pauses the app too; that is not leaving it.
+    if (_prompting) return;
+    if (state == AppLifecycleState.paused) {
+      _wasAway = true;
+      if (_locked) return;
+      final now = widget.clock();
+      _backgroundAt = now;
+      SharedPreferences.getInstance().then(
+        (p) => p.setInt(LockGate.backgroundAtKey, now.millisecondsSinceEpoch),
+      );
+      // "Immediately" hides the content before the app is even gone.
+      if (context.read<AppSettings>().lockTimeout == Duration.zero) {
+        setState(() => _locked = true);
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      if (!_wasAway) return;
+      _wasAway = false;
+      if (!_locked && _backgroundAt != null) {
+        final away = widget.clock().difference(_backgroundAt!);
+        if (away.isNegative ||
+            away >= context.read<AppSettings>().lockTimeout) {
+          setState(() => _locked = true);
+        }
+      }
+      _backgroundAt = null;
+      if (_locked) _unlock();
     }
   }
 
   Future<void> _unlock() async {
     if (_prompting || !mounted) return;
     _prompting = true;
-    final reason = context.read<AppSettings>().strings['lock.reason'];
-    final ok = await _service.authenticate(reason);
+    setState(() => _message = null);
+    final s = context.read<AppSettings>().strings;
+    LockAuthResult result = LockAuthResult.retry;
+    try {
+      result = await _service.authenticate(s['lock.reason']);
+    } catch (_) {
+      result = LockAuthResult.retry;
+    } finally {
+      // Whatever happened, the Unlock button must work again.
+      _prompting = false;
+    }
     if (!mounted) return;
-    _prompting = false;
-    if (ok) setState(() => _locked = false);
+    setState(() {
+      switch (result) {
+        case LockAuthResult.success:
+        case LockAuthResult.noCredentials:
+          _locked = false;
+        case LockAuthResult.lockedOut:
+          _message = s['lock.lockedOut'];
+        case LockAuthResult.retry:
+          break;
+      }
+    });
   }
 
   @override
@@ -157,6 +262,16 @@ class _LockGateState extends State<LockGate> with WidgetsBindingObserver {
                           icon: const Icon(Icons.fingerprint),
                           label: Text(s['lock.unlock']),
                         ),
+                        if (_message != null) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            _message!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
