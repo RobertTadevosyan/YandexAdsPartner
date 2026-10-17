@@ -85,6 +85,23 @@ class LockGate extends StatefulWidget {
   /// holds when the system kills the app in the background.
   static const backgroundAtKey = 'lock.backgroundAt';
 
+  static int _externalFlows = 0;
+
+  /// True while the app shows a system flow of its own (Google sign-in):
+  /// its screens pause the app, but the user has not left it.
+  static bool get inExternalFlow => _externalFlows > 0;
+
+  /// Runs [flow] without the lock treating its system screens as leaving
+  /// the app.
+  static Future<T> duringExternalFlow<T>(Future<T> Function() flow) async {
+    _externalFlows++;
+    try {
+      return await flow();
+    } finally {
+      _externalFlows--;
+    }
+  }
+
   @override
   State<LockGate> createState() => _LockGateState();
 }
@@ -155,7 +172,8 @@ class _LockGateState extends State<LockGate> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!mounted || !_enabled) return;
     // The system PIN screen pauses the app too; that is not leaving it.
-    if (_prompting) return;
+    // Neither are Google's sign-in screens.
+    if (_prompting || LockGate.inExternalFlow) return;
     if (state == AppLifecycleState.paused) {
       _wasAway = true;
       if (_locked) return;
@@ -232,12 +250,12 @@ class _LockGateState extends State<LockGate> with WidgetsBindingObserver {
                           width: 72,
                           height: 72,
                           decoration: BoxDecoration(
-                            color: Brand.amber,
+                            color: BrandPalette.of(context).heroStart,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.lock_outline,
-                            color: Brand.navy,
+                            color: BrandPalette.of(context).onHero,
                             size: 40,
                           ),
                         ),

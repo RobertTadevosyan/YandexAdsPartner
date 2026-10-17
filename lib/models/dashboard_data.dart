@@ -1,3 +1,4 @@
+import 'package:adpocket/core/day_zone.dart';
 import 'package:adpocket/models/report_point.dart';
 import 'package:adpocket/models/report_response.dart';
 
@@ -130,6 +131,9 @@ class DashboardData {
   final DateTime? coveredFrom;
   final DateTime? coveredTo;
 
+  /// Calendar the series' days are in (Moscow for Yandex, Pacific for AdMob).
+  final DayZone zone;
+
   const DashboardData({
     required this.series,
     required this.currency,
@@ -138,12 +142,16 @@ class DashboardData {
     this.topPeriodValue = 'thismonth',
     this.coveredFrom,
     this.coveredTo,
+    this.zone = DayZone.moscow,
   });
+
+  /// "Today" in the provider's calendar.
+  DateTime today([DateTime? now]) => zone.dayOf(now ?? DateTime.now());
 
   /// Covered span; older caches always came from one 90-day request, so it is
   /// the 90 days ending on the Moscow day they were fetched.
   (DateTime, DateTime) get coverage {
-    final to = coveredTo ?? moscowToday(fetchedAt);
+    final to = coveredTo ?? zone.dayOf(fetchedAt);
     return (coveredFrom ?? addDays(to, -89), to);
   }
 
@@ -155,10 +163,8 @@ class DashboardData {
 
   /// The API reports days in Moscow time (UTC+3, no DST), so "today" must be
   /// the Moscow calendar date, not the device's.
-  static DateTime moscowToday([DateTime? now]) {
-    final m = (now ?? DateTime.now()).toUtc().add(const Duration(hours: 3));
-    return DateTime(m.year, m.month, m.day);
-  }
+  static DateTime moscowToday([DateTime? now]) =>
+      DayZone.moscow.dayOf(now ?? DateTime.now());
 
   Iterable<DailyPoint> _between(DateTime from, DateTime to) =>
       series.where((p) => !p.date.isBefore(from) && !p.date.isAfter(to));
@@ -270,6 +276,7 @@ class DashboardData {
     topPeriodValue: topPeriodValue ?? this.topPeriodValue,
     coveredFrom: coveredFrom,
     coveredTo: coveredTo,
+    zone: zone,
   );
 
   Map<String, dynamic> toJson() => {
@@ -280,6 +287,7 @@ class DashboardData {
       'coveredFrom': coveredFrom!.toIso8601String().substring(0, 10),
     if (coveredTo != null)
       'coveredTo': coveredTo!.toIso8601String().substring(0, 10),
+    if (zone != DayZone.moscow) 'zone': zone.name,
     'series':
         series
             .map(
@@ -303,6 +311,7 @@ class DashboardData {
     topPeriodValue: json['topPeriodValue'] as String? ?? 'thismonth',
     coveredFrom: DateTime.tryParse(json['coveredFrom'] as String? ?? ''),
     coveredTo: DateTime.tryParse(json['coveredTo'] as String? ?? ''),
+    zone: DayZone.fromName(json['zone'] as String?),
     series:
         (json['series'] as List? ?? [])
             .whereType<Map>()

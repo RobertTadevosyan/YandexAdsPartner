@@ -118,11 +118,7 @@ class NotificationService {
         settings.notifyHour,
         settings.notifyMinute,
       );
-      final text = NotificationTexts.daily(
-        data,
-        lang,
-        DashboardData.moscowToday(fire),
-      );
+      final text = NotificationTexts.daily(data, lang, data.today(fire));
       // Repeats every day at the same time so it keeps firing even when the
       // app is not opened and there is no background job (iOS); the text is
       // refreshed on every data refresh.
@@ -230,11 +226,7 @@ class NotificationService {
   static Future<void> showTest(DashboardData data, AppSettings settings) async {
     if (!supported) return;
     await initialize();
-    final text = NotificationTexts.daily(
-      data,
-      settings.lang,
-      DashboardData.moscowToday(),
-    );
+    final text = NotificationTexts.daily(data, settings.lang, data.today());
     await _plugin.show(
       id: testId,
       title: text.title,

@@ -21,16 +21,107 @@ class Brand {
   static const chartLineAlt = Color(0xFF4FC3F7);
 }
 
-ThemeData _build(Brightness brightness) {
+/// Provider accent colours. Yandex accounts keep AdPocket's original amber
+/// and navy; AdMob accounts use Google's red, orange and blue. Only accent
+/// roles change; backgrounds and text colours are shared.
+@immutable
+class BrandPalette extends ThemeExtension<BrandPalette> {
+  /// Hero surfaces: the big Overview card, highlighted tiles, lock badge.
+  final Color heroStart;
+  final Color heroEnd;
+
+  /// Text and icons on hero surfaces.
+  final Color onHero;
+
+  /// Buttons, selected chips, indicators, badges.
+  final Color primary;
+  final Color onPrimary;
+
+  /// Selected navigation icon and text buttons, per brightness.
+  final Color primaryOnLight;
+  final Color primaryOnDark;
+  final Color linkOnLight;
+  final Color linkOnDark;
+
+  final Color chartLine;
+  final Color chartLineAlt;
+  final Color positive;
+  final Color negative;
+
+  const BrandPalette({
+    required this.heroStart,
+    required this.heroEnd,
+    required this.onHero,
+    required this.primary,
+    required this.onPrimary,
+    required this.primaryOnLight,
+    required this.primaryOnDark,
+    required this.linkOnLight,
+    required this.linkOnDark,
+    required this.chartLine,
+    required this.chartLineAlt,
+    required this.positive,
+    required this.negative,
+  });
+
+  static const yandex = BrandPalette(
+    heroStart: Brand.amber,
+    heroEnd: Brand.amberDark,
+    onHero: Brand.navy,
+    primary: Brand.amber,
+    onPrimary: Brand.navy,
+    primaryOnLight: Brand.navy,
+    primaryOnDark: Brand.amber,
+    linkOnLight: Color(0xFF8A6500),
+    linkOnDark: Brand.amber,
+    chartLine: Brand.chartLine,
+    chartLineAlt: Brand.chartLineAlt,
+    positive: Brand.positive,
+    negative: Brand.negative,
+  );
+
+  /// Google colours as used across AdMob: red and orange for the hero, blue
+  /// for actions and charts, green and red for changes.
+  static const admob = BrandPalette(
+    heroStart: Color(0xFFD93025),
+    heroEnd: Color(0xFFF57C00),
+    onHero: Colors.white,
+    primary: Color(0xFF1A73E8),
+    onPrimary: Colors.white,
+    primaryOnLight: Color(0xFF1A73E8),
+    primaryOnDark: Color(0xFF8AB4F8),
+    linkOnLight: Color(0xFF1A73E8),
+    linkOnDark: Color(0xFF8AB4F8),
+    chartLine: Color(0xFF4285F4),
+    chartLineAlt: Color(0xFFF57C00),
+    positive: Color(0xFF34A853),
+    negative: Color(0xFFEA4335),
+  );
+
+  static BrandPalette of(BuildContext context) =>
+      Theme.of(context).extension<BrandPalette>() ?? yandex;
+
+  @override
+  BrandPalette copyWith() => this;
+
+  @override
+  BrandPalette lerp(ThemeExtension<BrandPalette>? other, double t) =>
+      t < 0.5 || other is! BrandPalette ? this : other;
+}
+
+ThemeData _build(
+  Brightness brightness, [
+  BrandPalette p = BrandPalette.yandex,
+]) {
   final isDark = brightness == Brightness.dark;
   final scheme = ColorScheme(
     brightness: brightness,
-    primary: Brand.amber,
-    onPrimary: Brand.navy,
+    primary: p.primary,
+    onPrimary: p.onPrimary,
     secondary: isDark ? const Color(0xFF4FC3F7) : const Color(0xFF0277BD),
     onSecondary: isDark ? Brand.navy : Colors.white,
-    tertiary: Brand.amberDark,
-    onTertiary: Brand.navy,
+    tertiary: p.heroEnd,
+    onTertiary: p.onHero,
     error: const Color(0xFFFF6B6B),
     onError: Colors.white,
     surface: isDark ? Brand.navyCard : Brand.lightCard,
@@ -54,6 +145,7 @@ ThemeData _build(Brightness brightness) {
   );
 
   return base.copyWith(
+    extensions: [p],
     appBarTheme: AppBarTheme(
       backgroundColor: scaffoldBg,
       foregroundColor: scheme.onSurface,
@@ -75,12 +167,12 @@ ThemeData _build(Brightness brightness) {
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: scheme.surface,
-      indicatorColor: Brand.amber.withValues(alpha: isDark ? 0.25 : 0.35),
+      indicatorColor: p.primary.withValues(alpha: isDark ? 0.25 : 0.35),
       iconTheme: WidgetStateProperty.resolveWith(
         (states) => IconThemeData(
           color:
               states.contains(WidgetState.selected)
-                  ? (isDark ? Brand.amber : Brand.navy)
+                  ? (isDark ? p.primaryOnDark : p.primaryOnLight)
                   : scheme.onSurfaceVariant,
         ),
       ),
@@ -101,9 +193,9 @@ ThemeData _build(Brightness brightness) {
     ),
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: scheme.surface,
-      indicatorColor: Brand.amber.withValues(alpha: isDark ? 0.25 : 0.35),
+      indicatorColor: p.primary.withValues(alpha: isDark ? 0.25 : 0.35),
       selectedIconTheme: IconThemeData(
-        color: isDark ? Brand.amber : Brand.navy,
+        color: isDark ? p.primaryOnDark : p.primaryOnLight,
       ),
       unselectedIconTheme: IconThemeData(color: scheme.onSurfaceVariant),
       selectedLabelTextStyle: TextStyle(
@@ -120,8 +212,8 @@ ThemeData _build(Brightness brightness) {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Brand.amber,
-        foregroundColor: Brand.navy,
+        backgroundColor: p.primary,
+        foregroundColor: p.onPrimary,
         elevation: 0,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         textStyle: TextStyle(
@@ -134,8 +226,8 @@ ThemeData _build(Brightness brightness) {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: Brand.amber,
-        foregroundColor: Brand.navy,
+        backgroundColor: p.primary,
+        foregroundColor: p.onPrimary,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         textStyle: TextStyle(
           fontFamily: _screenshotFont,
@@ -155,7 +247,7 @@ ThemeData _build(Brightness brightness) {
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: isDark ? Brand.amber : const Color(0xFF8A6500),
+        foregroundColor: isDark ? p.linkOnDark : p.linkOnLight,
         textStyle: TextStyle(
           fontFamily: _screenshotFont,
           fontWeight: FontWeight.w600,
@@ -164,7 +256,7 @@ ThemeData _build(Brightness brightness) {
     ),
     chipTheme: ChipThemeData(
       backgroundColor: scheme.surface,
-      selectedColor: Brand.amber,
+      selectedColor: p.primary,
       disabledColor: scheme.surfaceContainerHighest,
       side: BorderSide(color: scheme.outline),
       labelStyle: TextStyle(
@@ -174,10 +266,10 @@ ThemeData _build(Brightness brightness) {
       ),
       secondaryLabelStyle: TextStyle(
         fontFamily: _screenshotFont,
-        color: Brand.navy,
+        color: p.onPrimary,
         fontWeight: FontWeight.w600,
       ),
-      checkmarkColor: Brand.navy,
+      checkmarkColor: p.onPrimary,
       showCheckmark: false,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -195,7 +287,7 @@ ThemeData _build(Brightness brightness) {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Brand.amber, width: 2),
+        borderSide: BorderSide(color: p.primary, width: 2),
       ),
       labelStyle: TextStyle(
         fontFamily: _screenshotFont,
@@ -228,19 +320,17 @@ ThemeData _build(Brightness brightness) {
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith(
-        (s) => s.contains(WidgetState.selected) ? Brand.navy : null,
+        (s) => s.contains(WidgetState.selected) ? p.onPrimary : null,
       ),
       trackColor: WidgetStateProperty.resolveWith(
-        (s) => s.contains(WidgetState.selected) ? Brand.amber : null,
+        (s) => s.contains(WidgetState.selected) ? p.primary : null,
       ),
     ),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: Brand.amber,
-    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: p.primary),
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: SegmentedButton.styleFrom(
-        selectedBackgroundColor: Brand.amber,
-        selectedForegroundColor: Brand.navy,
+        selectedBackgroundColor: p.primary,
+        selectedForegroundColor: p.onPrimary,
         foregroundColor: scheme.onSurface,
         side: BorderSide(color: scheme.outline),
       ),
@@ -267,6 +357,8 @@ ThemeData _build(Brightness brightness) {
 
 final ThemeData adPocketDarkTheme = _build(Brightness.dark);
 final ThemeData adPocketLightTheme = _build(Brightness.light);
+final ThemeData adMobDarkTheme = _build(Brightness.dark, BrandPalette.admob);
+final ThemeData adMobLightTheme = _build(Brightness.light, BrandPalette.admob);
 
 /// Kept for backwards compatibility.
 final ThemeData adPocketTheme = adPocketDarkTheme;

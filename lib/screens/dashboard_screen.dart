@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:adpocket/core/day_zone.dart';
 import 'package:adpocket/core/formatters.dart';
 import 'package:adpocket/core/layout.dart';
 import 'package:adpocket/core/period.dart';
 import 'package:adpocket/core/session.dart';
 import 'package:adpocket/core/settings.dart';
+import 'package:adpocket/models/stat_type.dart';
 import 'package:adpocket/models/dashboard_data.dart';
 import 'package:adpocket/models/filter_field.dart';
 import 'package:adpocket/models/report_preset.dart';
@@ -152,30 +154,49 @@ class _DashboardScreenState extends State<DashboardScreen>
         !mounted || session.accountId != accountId || seq != _fetchSeq;
     final loader = DashboardLoader(session.api, clock: widget.clock);
     final topPeriod = _topPeriod;
+    final account = session.active;
+    final adMob = account != null && account.isAdMob;
     try {
-      final daily = await loader.loadDaily(
-        token: token,
-        lang: settings.lang,
-        currency: settings.currency,
-        vat: settings.vat,
-        cached: _data,
-        onProgress: (done, total) {
-          if (!stale()) setState(() => _progress = (done, total));
-        },
-      );
+      final daily =
+          adMob
+              ? await session.admob.loadDaily(
+                account,
+                lang: settings.lang,
+                currency: settings.currency,
+                now: widget.clock(),
+              )
+              : await loader.loadDaily(
+                token: token,
+                lang: settings.lang,
+                currency: settings.currency,
+                vat: settings.vat,
+                cached: _data,
+                onProgress: (done, total) {
+                  if (!stale()) setState(() => _progress = (done, total));
+                },
+              );
       if (stale()) return;
       // Apps and sites is secondary: if it fails, keep the previous list and
       // still show fresh revenue.
       ReportResponse? top =
           _data?.topPeriodValue == topPeriod.value ? _data?.topEntities : null;
       try {
-        top = await loader.loadTop(
-          token: token,
-          preset: topPeriod,
-          lang: settings.lang,
-          currency: settings.currency,
-          vat: settings.vat,
-        );
+        top =
+            adMob
+                ? await session.admob.loadTop(
+                  account,
+                  preset: topPeriod,
+                  lang: settings.lang,
+                  currency: settings.currency,
+                  now: widget.clock(),
+                )
+                : await loader.loadTop(
+                  token: token,
+                  preset: topPeriod,
+                  lang: settings.lang,
+                  currency: settings.currency,
+                  vat: settings.vat,
+                );
       } on ApiException catch (e) {
         if (e.isUnauthorized) rethrow;
       }
@@ -188,6 +209,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         topPeriodValue: topPeriod.value,
         coveredFrom: daily.coveredFrom,
         coveredTo: daily.coveredTo,
+        zone: adMob ? DayZone.pacific : DayZone.moscow,
       );
       await ReportCache.saveDashboard(data, accountId: accountId);
       WidgetService.push(
@@ -236,17 +258,24 @@ class _DashboardScreenState extends State<DashboardScreen>
       _topPeriod = preset;
       _loadingTop = true;
     });
+    final account = session.active;
     try {
-      final top = await DashboardLoader(
-        session.api,
-        clock: widget.clock,
-      ).loadTop(
-        token: token,
-        preset: preset,
-        lang: settings.lang,
-        currency: settings.currency,
-        vat: settings.vat,
-      );
+      final top =
+          account != null && account.isAdMob
+              ? await session.admob.loadTop(
+                account,
+                preset: preset,
+                lang: settings.lang,
+                currency: settings.currency,
+                now: widget.clock(),
+              )
+              : await DashboardLoader(session.api, clock: widget.clock).loadTop(
+                token: token,
+                preset: preset,
+                lang: settings.lang,
+                currency: settings.currency,
+                vat: settings.vat,
+              );
       if (!mounted || session.accountId != accountId || _data == null) return;
       final data = _data!.copyWith(
         topEntities: top,
@@ -269,6 +298,27 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   void _openTopEntityReport(String pageId, String caption) {
+    if (context.read<AppSession>().active?.isAdMob == true) {
+      widget.onOpenReport?.call(
+        ReportPreset(
+          name: caption,
+          period: ReportPeriod.preset(_topPeriod),
+          metricIds: StatType.admobNetwork.preferredMetrics,
+          groups: const {'date': 'day'},
+          filters: [
+            ReportFilter(
+              fieldId: 'app',
+              fieldLabel: 'app',
+              op: FilterOp.eq,
+              values: [pageId],
+              valueLabels: [caption],
+            ),
+          ],
+          statType: StatType.admobNetwork,
+        ),
+      );
+      return;
+    }
     widget.onOpenReport?.call(
       ReportPreset(
         name: caption,
@@ -369,8 +419,9 @@ class _DashboardScreenState extends State<DashboardScreen>
         (width - 32 - 36 - 8 * (statColumns - 1)) / statColumns;
     final statAspect = statTileWidth / 108;
     final scheme = Theme.of(context).colorScheme;
+    final brand = BrandPalette.of(context);
     final cur = data.currency;
-    final now = DashboardData.moscowToday(widget.clock());
+    final now = data.today(widget.clock());
     final (today, yesterday) = data.window(DashWindow.today, now: now);
     final (yest, beforeYest) = data.window(DashWindow.yesterday, now: now);
     final (week, prevWeek) = data.window(DashWindow.days7, now: now);
@@ -457,8 +508,8 @@ class _DashboardScreenState extends State<DashboardScreen>
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Brand.amber, Brand.amberDark],
+            gradient: LinearGradient(
+              colors: [brand.heroStart, brand.heroEnd],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -470,7 +521,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               Text(
                 '${s['dash.today']} · ${Fmt.date(now, lang)}',
                 style: TextStyle(
-                  color: Brand.navy.withValues(alpha: 0.8),
+                  color: brand.onHero.withValues(alpha: 0.8),
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
@@ -481,8 +532,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                 alignment: Alignment.centerLeft,
                 child: Text(
                   money(today.revenue),
-                  style: const TextStyle(
-                    color: Brand.navy,
+                  style: TextStyle(
+                    color: brand.onHero,
                     fontSize: 36,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1,
@@ -501,13 +552,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                               ? Icons.trending_up
                               : Icons.trending_down,
                           size: 18,
-                          color: Brand.navy,
+                          color: brand.onHero,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           d,
-                          style: const TextStyle(
-                            color: Brand.navy,
+                          style: TextStyle(
+                            color: brand.onHero,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -519,7 +570,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: Brand.navy.withValues(alpha: 0.75),
+                            color: brand.onHero.withValues(alpha: 0.75),
                             fontSize: 12,
                           ),
                         ),
@@ -617,7 +668,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             unit: _showShows ? 'count' : 'money',
             currency: cur,
             lang: lang,
-            color: _showShows ? Brand.chartLineAlt : Brand.chartLine,
+            color: _showShows ? brand.chartLineAlt : brand.chartLine,
           ),
         ),
         const SizedBox(height: 16),
@@ -806,13 +857,14 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _heroStat(IconData icon, String label, String value) {
+    final brand = BrandPalette.of(context);
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 14, color: Brand.navy.withValues(alpha: 0.75)),
+              Icon(icon, size: 14, color: brand.onHero.withValues(alpha: 0.75)),
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
@@ -821,7 +873,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Brand.navy.withValues(alpha: 0.75),
+                    color: brand.onHero.withValues(alpha: 0.75),
                   ),
                 ),
               ),
@@ -833,8 +885,8 @@ class _DashboardScreenState extends State<DashboardScreen>
             alignment: Alignment.centerLeft,
             child: Text(
               value,
-              style: const TextStyle(
-                color: Brand.navy,
+              style: TextStyle(
+                color: brand.onHero,
                 fontWeight: FontWeight.w700,
                 fontSize: 15,
               ),
@@ -853,6 +905,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     bool positive,
   ) {
     final scheme = Theme.of(context).colorScheme;
+    final brand = BrandPalette.of(context);
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -885,7 +938,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: positive ? Brand.positive : Brand.negative,
+                color: positive ? brand.positive : brand.negative,
               ),
             ),
           ],

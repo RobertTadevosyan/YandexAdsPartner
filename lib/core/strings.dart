@@ -190,7 +190,30 @@ class AppStrings {
     'acc.rename': 'Переименовать',
     'acc.remove': 'Удалить аккаунт',
     'acc.removeConfirm': 'Удалить токен этого аккаунта с устройства?',
+    'acc.removeConfirmAdMob':
+        'Удалить этот аккаунт AdMob с устройства и отозвать доступ AdPocket к Google‑аккаунту?',
     'acc.added': 'Аккаунт добавлен',
+
+    // AdMob
+    'admob.connect': 'Подключить AdMob через Google',
+    'admob.title': 'Подключите аккаунт AdMob',
+    'admob.subtitle':
+        'Войдите в Google‑аккаунт с доступом к AdMob. AdPocket получает доступ только на чтение отчётов; данные остаются на этом устройстве.',
+    'admob.signIn': 'Войти через Google',
+    'admob.connecting': 'Подключение…',
+    'admob.reconnect': 'Переподключить Google',
+    'admob.reconnected': 'Доступ к AdMob обновлён',
+    'admob.pick': 'Выберите аккаунт AdMob',
+    'admob.noAccounts': 'У этого Google‑аккаунта нет аккаунтов AdMob.',
+    'admob.noAccess':
+        'Google не дал доступ к AdMob. Войдите аккаунтом с доступом к отчётам AdMob.',
+    'admob.howto': 'Как подключить',
+    'admob.step1':
+        'Нажмите «Войти через Google» и выберите аккаунт, которым входите в AdMob.',
+    'admob.step2':
+        'Разрешите AdPocket просматривать отчёты AdMob (только чтение).',
+    'admob.step3': 'Если аккаунтов AdMob несколько — выберите нужный.',
+    'admob.open': 'Открыть AdMob',
     'acc.switchTo': 'Переключить аккаунт',
     'set.token': 'Токен API статистики',
     'set.changeToken': 'Заменить токен',
@@ -292,6 +315,7 @@ class AppStrings {
     'battery.hint.vivo':
         'vivo / iQOO: Сведения о приложении → Батарея → «Высокое энергопотребление в фоне» и включите «Автозапуск».',
     'widget.offline': 'нет сети',
+    'widget.openApp': 'откройте приложение',
     'set.widgetIosHint':
         'Удерживайте пустое место на главном экране → «+» → AdPocket. Виджет обновляется сам примерно каждые 30 минут и при каждом открытии приложения.',
     'widget.error': 'ошибка',
@@ -481,7 +505,29 @@ class AppStrings {
     'acc.rename': 'Rename',
     'acc.remove': 'Remove account',
     'acc.removeConfirm': "Remove this account's token from this device?",
+    'acc.removeConfirmAdMob':
+        "Remove this AdMob account from this device and revoke AdPocket's access to the Google account?",
     'acc.added': 'Account added',
+
+    // AdMob
+    'admob.connect': 'Connect AdMob with Google',
+    'admob.title': 'Connect your AdMob account',
+    'admob.subtitle':
+        'Sign in with the Google account you use for AdMob. AdPocket gets read-only access to reports; your data stays on this device.',
+    'admob.signIn': 'Sign in with Google',
+    'admob.connecting': 'Connecting…',
+    'admob.reconnect': 'Reconnect Google',
+    'admob.reconnected': 'AdMob access renewed',
+    'admob.pick': 'Choose an AdMob account',
+    'admob.noAccounts': 'This Google account has no AdMob accounts.',
+    'admob.noAccess':
+        'Google did not grant AdMob access. Sign in with an account that can see AdMob reports.',
+    'admob.howto': 'How to connect',
+    'admob.step1':
+        'Tap "Sign in with Google" and choose the account you use for AdMob.',
+    'admob.step2': 'Allow AdPocket to view your AdMob reports (read-only).',
+    'admob.step3': 'If you have several AdMob accounts, pick one.',
+    'admob.open': 'Open AdMob',
     'acc.switchTo': 'Switch account',
     'set.token': 'Statistics API token',
     'set.changeToken': 'Replace token',
@@ -583,6 +629,7 @@ class AppStrings {
     'battery.hint.vivo':
         'vivo / iQOO: App info → Battery → High background power consumption, and enable Autostart.',
     'widget.offline': 'offline',
+    'widget.openApp': 'open the app',
     'set.widgetIosHint':
         'Long-press an empty spot on the home screen → “+” → AdPocket. The widget refreshes itself about every 30 minutes and whenever the app opens.',
     'widget.error': 'error',

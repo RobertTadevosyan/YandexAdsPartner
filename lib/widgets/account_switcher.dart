@@ -25,11 +25,11 @@ class AccountButton extends StatelessWidget {
           padding: const EdgeInsets.all(6),
           child: CircleAvatar(
             radius: 16,
-            backgroundColor: Brand.amber,
+            backgroundColor: paletteFor(active).primary,
             child: Text(
               active.initials,
-              style: const TextStyle(
-                color: Brand.navy,
+              style: TextStyle(
+                color: paletteFor(active).onPrimary,
                 fontWeight: FontWeight.w800,
                 fontSize: 12,
               ),
@@ -126,11 +126,13 @@ class AccountTile extends StatelessWidget {
       onTap: onTap,
       leading: CircleAvatar(
         backgroundColor:
-            selected ? Brand.amber : scheme.surfaceContainerHighest,
+            selected
+                ? paletteFor(account).primary
+                : scheme.surfaceContainerHighest,
         child: Text(
           account.initials,
           style: TextStyle(
-            color: selected ? Brand.navy : scheme.onSurface,
+            color: selected ? paletteFor(account).onPrimary : scheme.onSurface,
             fontWeight: FontWeight.w800,
             fontSize: 13,
           ),
@@ -146,8 +148,13 @@ class AccountTile extends StatelessWidget {
       trailing:
           trailing ??
           (selected
-              ? const Icon(Icons.check_circle, color: Brand.amber)
+              ? Icon(Icons.check_circle, color: paletteFor(account).primary)
               : null),
     );
   }
 }
+
+/// Each account wears its provider's colours wherever it is listed, whatever
+/// account is active.
+BrandPalette paletteFor(Account account) =>
+    account.isAdMob ? BrandPalette.admob : BrandPalette.yandex;

@@ -18,6 +18,7 @@ import 'package:adpocket/models/report_preset.dart';
 import 'package:adpocket/models/report_response.dart';
 import 'package:adpocket/models/stat_type.dart';
 import 'package:adpocket/models/tree_catalog.dart';
+import 'package:adpocket/services/admob_api_service.dart';
 import 'package:adpocket/services/api_exception.dart';
 import 'package:adpocket/services/report_cache.dart';
 import 'package:adpocket/services/yandex_api_service.dart';
@@ -74,6 +75,7 @@ class ReportsScreenState extends State<ReportsScreen> {
   @override
   void initState() {
     super.initState();
+    if (_isAdMob) _statType = StatType.admobNetwork;
     _restore();
   }
 
@@ -96,7 +98,7 @@ class ReportsScreenState extends State<ReportsScreen> {
         _metricIds = [];
         _groups = {};
         _filters = [];
-        _statType = StatType.main;
+        _statType = StatType.defaultFor(admob: _isAdMob);
       });
       _restore(applyInitial: false);
     }
@@ -122,6 +124,13 @@ class ReportsScreenState extends State<ReportsScreen> {
         _filters = preset.filters;
         _statType = preset.statType;
       } catch (_) {}
+    }
+    if (_statType.isAdMob != _isAdMob) {
+      // A saved report of the other provider's kind: start from defaults.
+      _metricIds = [];
+      _groups = {};
+      _filters = [];
+      _statType = StatType.defaultFor(admob: _isAdMob);
     }
     _restored = true;
     if (!mounted) return;
@@ -193,6 +202,8 @@ class ReportsScreenState extends State<ReportsScreen> {
   }
 
   bool get _hasValidSelection => _metricIds.isNotEmpty && _groups.isNotEmpty;
+
+  bool get _isAdMob => context.read<AppSession>().active?.isAdMob == true;
 
   static List<String> _defaultMetrics(TreeCatalog catalog, StatType type) {
     final preferred =
@@ -343,15 +354,37 @@ class ReportsScreenState extends State<ReportsScreen> {
 
       // Only a fresh run of a long period can need the fallback; paging and
       // re-sorting a normal result stay normal.
+      ReportResponse? response;
+      final account = session.active;
+      if (account != null && account.isAdMob) {
+        response = await session.admob.fetchReport(
+          account,
+          kind:
+              _statType == StatType.admobMediation
+                  ? AdMobReportKind.mediation
+                  : AdMobReportKind.network,
+          period: _period,
+          fields: _metricIds,
+          dimensionFields: _dimensionFields,
+          entityFields: _entityFields,
+          filters: _filters,
+          orderBy: order,
+          limit: 1 << 30,
+          lang: settings.lang,
+          currency: settings.currency,
+        );
+      }
       final long =
+          response == null &&
           !append &&
           !resort &&
           _period.spanDays(DashboardData.moscowToday()) >
               LongPeriodGuard.maxSpanDays;
       final guard = LongPeriodGuard();
-      ReportResponse? response;
       AssembledReport? assembled;
-      if (long && await guard.recentlyRejected()) {
+      if (response != null) {
+        // AdMob: no long-period limit, nothing to fall back to.
+      } else if (long && await guard.recentlyRejected()) {
         assembled = await assemble();
       } else {
         try {
@@ -366,7 +399,10 @@ class ReportsScreenState extends State<ReportsScreen> {
       if (!mounted || session.accountId != accountId) return;
       setState(() {
         _progress = null;
-        if (assembled != null) {
+        if (assembled == null && response != null && _statType.isAdMob) {
+          _full = response;
+          _report = _page(response, _pageSize);
+        } else if (assembled != null) {
           _full = assembled.report;
           _assembled = assembled;
           _report = _page(assembled.report, _pageSize);
@@ -570,6 +606,9 @@ class ReportsScreenState extends State<ReportsScreen> {
     final scheme = Theme.of(context).colorScheme;
     final catalog = _catalog;
     final report = _report;
+    final types = StatType.forAccount(
+      admob: context.watch<AppSession>().active?.isAdMob == true,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -609,10 +648,10 @@ class ReportsScreenState extends State<ReportsScreen> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: StatType.values.length,
+                itemCount: types.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (_, i) {
-                  final t = StatType.values[i];
+                  final t = types[i];
                   return ChoiceChip(
                     label: Text(t.label(lang)),
                     selected: _statType == t,
@@ -728,14 +767,14 @@ class ReportsScreenState extends State<ReportsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                 decoration: BoxDecoration(
-                  color: Brand.amber,
+                  color: BrandPalette.of(context).primary,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '$count',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: Brand.navy,
+                    color: BrandPalette.of(context).onPrimary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

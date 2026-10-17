@@ -10,6 +10,9 @@ import 'package:adpocket/services/demo_client.dart';
 import 'package:adpocket/services/notification_service.dart';
 import 'package:adpocket/services/report_cache.dart';
 import 'package:adpocket/services/token_storage.dart';
+import 'package:adpocket/services/admob_api_service.dart';
+import 'package:adpocket/models/account.dart';
+import 'package:adpocket/core/day_zone.dart';
 import 'package:adpocket/services/yandex_api_service.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
@@ -53,7 +56,7 @@ class WidgetService {
         'updated': '',
       };
     }
-    final today = now ?? DashboardData.moscowToday();
+    final today = now ?? data.today();
     final (cur, prev) = data.window(DashWindow.today, now: today);
     final delta = Fmt.delta(cur.revenue, prev.revenue, lang);
     final deltaText =
@@ -155,6 +158,9 @@ class WidgetService {
     final api = YandexApiService(client: kDemoMode ? demoClient() : null);
     final accountId = await TokenStorage.getActiveAccountId();
     final cached = await ReportCache.loadDashboard(accountId: accountId);
+    if (token.startsWith(Account.admobTokenPrefix)) {
+      return _refreshAdMob(accountId, cached, settings, s, source);
+    }
     final DailySeries daily;
     try {
       daily = await DashboardLoader(api).loadDaily(
@@ -185,6 +191,57 @@ class WidgetService {
       topPeriodValue: cached?.topPeriodValue ?? 'thismonth',
       coveredFrom: daily.coveredFrom,
       coveredTo: daily.coveredTo,
+    );
+    await ReportCache.saveDashboard(data, accountId: accountId);
+    await push(
+      data,
+      lang: settings.lang,
+      currency: settings.currency,
+      vat: settings.vat,
+      source: source,
+    );
+    await NotificationService.onDataRefreshed(data, settings);
+    return true;
+  }
+
+  /// AdMob accounts: Google's silent sign-in gives the access token. If it
+  /// cannot (the grant needs the app), the widget keeps its numbers and asks
+  /// to open the app instead of signing out.
+  static Future<bool> _refreshAdMob(
+    String? accountId,
+    DashboardData? cached,
+    AppSettings settings,
+    AppStrings s,
+    String source,
+  ) async {
+    final accounts = await TokenStorage.loadAccounts(defaultLabel: '');
+    final account =
+        accounts.where((a) => a.id == accountId && a.isAdMob).firstOrNull;
+    if (account == null) return true;
+    final DailySeries daily;
+    try {
+      daily = await AdMobApiService().loadDaily(
+        account,
+        lang: settings.lang,
+        currency: settings.currency,
+      );
+    } on ApiException catch (e) {
+      await _flag(
+        e.isNetwork
+            ? s['widget.offline']
+            : (e.isUnauthorized ? s['widget.openApp'] : s['widget.error']),
+      );
+      rethrow;
+    }
+    final data = DashboardData(
+      series: daily.points,
+      currency: daily.currency ?? settings.currency,
+      fetchedAt: DateTime.now(),
+      topEntities: cached?.topEntities,
+      topPeriodValue: cached?.topPeriodValue ?? 'thismonth',
+      coveredFrom: daily.coveredFrom,
+      coveredTo: daily.coveredTo,
+      zone: DayZone.pacific,
     );
     await ReportCache.saveDashboard(data, accountId: accountId);
     await push(

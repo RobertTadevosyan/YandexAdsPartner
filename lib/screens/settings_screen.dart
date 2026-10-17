@@ -5,6 +5,7 @@ import 'package:adpocket/core/app_lock.dart';
 import 'package:adpocket/core/layout.dart';
 import 'package:adpocket/core/session.dart';
 import 'package:adpocket/core/settings.dart';
+import 'package:adpocket/screens/admob_connect_screen.dart';
 import 'package:adpocket/screens/token_screen.dart';
 import 'package:adpocket/services/report_cache.dart';
 import 'package:adpocket/services/widget_service.dart';
@@ -92,10 +93,15 @@ class SettingsScreen extends StatelessWidget {
         if (name != null) await session.renameAccount(id, name);
       case 'replace':
         if (id != session.accountId) await session.switchAccount(id);
+        final adMob = session.active?.isAdMob == true;
         if (context.mounted) {
           await Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => const TokenScreen(mode: TokenScreenMode.replace),
+              builder:
+                  (_) =>
+                      adMob
+                          ? const AdMobConnectScreen(reconnect: true)
+                          : const TokenScreen(mode: TokenScreenMode.replace),
             ),
           );
         }
@@ -105,7 +111,11 @@ class SettingsScreen extends StatelessWidget {
           builder:
               (ctx) => AlertDialog(
                 title: Text(s['acc.remove']),
-                content: Text(s['acc.removeConfirm']),
+                content: Text(
+                  s[session.accounts.any((a) => a.id == id && a.isAdMob)
+                      ? 'acc.removeConfirmAdMob'
+                      : 'acc.removeConfirm'],
+                ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(ctx, false),
@@ -263,7 +273,11 @@ class SettingsScreen extends StatelessWidget {
                               ),
                               PopupMenuItem(
                                 value: 'replace',
-                                child: Text(s['set.changeToken']),
+                                child: Text(
+                                  a.isAdMob
+                                      ? s['admob.reconnect']
+                                      : s['set.changeToken'],
+                                ),
                               ),
                               PopupMenuItem(
                                 value: 'remove',

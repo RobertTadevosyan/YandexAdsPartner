@@ -44,8 +44,11 @@ class AppShellState extends State<AppShell> {
     // switched on at build time or the user already holds an inventory
     // token; Yandex issues those tokens to few partners, and store reviewers
     // cannot exercise the tab.
+    // Yandex inventory only: never for an AdMob account.
+    final session = context.watch<AppSession>();
     final showAdUnits =
-        kAdUnitsEnabled || context.watch<AppSession>().hasInventoryToken;
+        (kAdUnitsEnabled || session.hasInventoryToken) &&
+        session.active?.isAdMob != true;
     final pages = <Widget>[
       DashboardScreen(onOpenReport: openReport),
       ReportsScreen(key: _reportsKey, initialPreset: _pendingPreset),
